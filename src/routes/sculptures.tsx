@@ -1,134 +1,166 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
-import { ArrowRight, Camera, Palette, Package } from "lucide-react";
-import cover from "@/assets/Memory3D_Sculptures.avif";
-import cover1 from "@/assets/Memory3D_Sculptures_1.avif";
-import s1 from "@/assets/3D-Sculp-1.avif";
-import s2 from "@/assets/3D-Sculp-2.avif";
-import s3 from "@/assets/3D-Sculp-3.avif";
-import s4 from "@/assets/3D-Sculp-4.jpg";
-import s5 from "@/assets/3D-Sculp-5.jpg";
-import s6 from "@/assets/3D-Sculp-6.jpg";
-import s7 from "@/assets/3D-Sculp-7.jpg";
+import { Send, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/sculptures")({
   head: () => ({
     meta: [
-      { title: "3D Sculptures -  Full-Color Figurines of You | Memory3D" },
+      { title: "3D Sculptures – Book Your Scan | Memory3D" },
       {
         name: "description",
         content:
-          "Step into our scanner and walk out with a full-color sculpture of yourself, your family or your pet. Crafted to the last detail.",
+          "Book a 3D sculpture session. Tell us about your project and we'll be in touch within 24 hours.",
       },
-      { property: "og:title", content: "3D Sculptures -  Memory3D" },
-      {
-        property: "og:description",
-        content: "Full-color hand-finished figurines from a 12-second scan.",
-      },
-      { property: "og:image", content: cover },
+      { property: "og:title", content: "3D Sculptures – Memory3D" },
+      { property: "og:description", content: "Book your 3D sculpture scan with Memory3D." },
     ],
   }),
-  component: Sculptures,
+  component: SculpturesPage,
 });
 
-function Sculptures() {
+function SculpturesPage() {
+  const [sent, setSent] = useState(false);
+
   return (
-    <div className="bg-background">
-      <section className="relative min-h-[70vh] flex items-end pt-40 pb-20 overflow-hidden">
-        <div className="absolute inset-0">
-          <img 
-            src={cover} 
-            alt="3D Sculpture Banner" 
-            className="w-full h-full object-cover object-[center_10%]" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+    <div className="bg-background min-h-screen">
+      {/* ── Hero ── */}
+      <section className="pt-40 pb-16 bg-gradient-hero border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 lg:px-10">
           <Reveal>
-            <span className="text-[11px] tracking-[0.35em] uppercase text-gold font-bold">3D Sculptures</span>
-            <h1 className="font-display text-6xl md:text-[7rem] mt-4 max-w-4xl leading-[0.9] text-foreground">
-              You, <em className="text-gradient-gold not-italic">in miniature.</em>
+            <span className="text-[11px] tracking-[0.35em] uppercase text-gold font-medium">
+              3D Sculptures
+            </span>
+            <h1 className="font-display text-6xl md:text-8xl mt-4 leading-[0.95] text-foreground">
+              You, in <br />
+              <em className="text-gradient-gold not-italic">miniature.</em>
             </h1>
-            <p className="mt-8 text-xl text-muted-foreground max-w-xl font-light leading-relaxed">
-              Full-color, hand-finished figurines crafted from a single 12-second 3D scan. Stand on
-              your shelf forever.
+            <p className="mt-6 text-lg text-muted-foreground max-w-xl font-light leading-relaxed">
+              Full-color, hand-finished figurines crafted from a single 12-second 3D scan.
+              Fill in the form below and our team will reach out within 24 hours.
             </p>
           </Reveal>
         </div>
       </section>
 
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="grid md:grid-cols-3 gap-12">
-            {[
-              {
-                icon: Camera,
-                t: "12-Second Scan",
-                b: "Our pop-up scanner captures every detail in one quick session.",
-              },
-              {
-                icon: Palette,
-                t: "Full Color",
-                b: "Every freckle, every stitch, every shade - printed in stunning color.",
-              },
-              {
-                icon: Package,
-                t: "Hand Finished",
-                b: "Each sculpture is inspected and detailed by our artisans before shipping.",
-              },
-            ].map((f, i) => (
-              <Reveal key={f.t} delay={i * 0.1}>
-                <div>
-                  <f.icon className="w-8 h-8 text-gold mb-5" />
-                  <h3 className="font-display text-2xl mb-2">{f.t}</h3>
-                  <p className="text-muted-foreground">{f.b}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* ── Form ── */}
       <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { src: s1, pos: "object-center" },
-            { src: s2, pos: "object-center" },
-            { src: s3, pos: "object-center" },
-            { src: s4, pos: "object-top" },
-            { src: s5, pos: "object-center" },
-            { src: s6, pos: "object-center" },
-            { src: s7, pos: "object-center" },
-            { src: cover1, pos: "object-top" },
-          ].map((item, i) => (
-            <Reveal key={i} delay={(i % 4) * 0.08}>
-              <div className="relative aspect-[3/4] overflow-hidden bg-card rounded-sm group border border-white/5">
-                <img
-                  src={item.src}
-                  alt=""
-                  className={`w-full h-full object-cover ${item.pos} transition-transform duration-700 group-hover:scale-110`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="max-w-2xl mx-auto px-6 lg:px-10">
+          <Reveal>
+            {sent ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <CheckCircle className="w-16 h-16 text-gold mb-6" />
+                <h2 className="font-display text-4xl text-foreground mb-3">Request Received!</h2>
+                <p className="text-muted-foreground max-w-sm">
+                  Thank you for your interest. Our team will get back to you within 24 hours to
+                  schedule your scan session.
+                </p>
+                <button
+                  onClick={() => setSent(false)}
+                  className="mt-8 text-[11px] tracking-[0.2em] uppercase text-gold hover:underline font-medium"
+                >
+                  Submit another request
+                </button>
               </div>
-            </Reveal>
-          ))}
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setSent(true);
+                  toast.success("Request sent – we'll be in touch within 24 hours.");
+                }}
+                className="space-y-5"
+              >
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <Field label="Full Name">
+                    <input required className="input" placeholder="Your full name" />
+                  </Field>
+                  <Field label="Email">
+                    <input required type="email" className="input" placeholder="you@email.com" />
+                  </Field>
+                </div>
+
+                <Field label="Phone Number">
+                  <input type="tel" className="input" placeholder="+1 (555) 000-0000" />
+                </Field>
+
+                <Field label="What would you like to sculpt?">
+                  <select className="input">
+                    <option>Individual (single person)</option>
+                    <option>Couple</option>
+                    <option>Family group</option>
+                    <option>Pet</option>
+                    <option>Group (5+ people)</option>
+                    <option>Other</option>
+                  </select>
+                </Field>
+
+                <Field label="Preferred scan date / location">
+                  <input className="input" placeholder="e.g. Flexible, or a specific city / date" />
+                </Field>
+
+                <Field label="Tell us more about your project">
+                  <textarea
+                    required
+                    rows={5}
+                    className="input resize-none"
+                    placeholder="The occasion, people involved, any special requests…"
+                  />
+                </Field>
+
+                <button
+                  type="submit"
+                  className="w-full inline-flex items-center justify-center gap-3 bg-gradient-gold text-white py-4 text-[11px] tracking-[0.3em] uppercase rounded-sm shadow-gold hover:opacity-90 transition font-bold"
+                >
+                  Send Request <Send className="w-4 h-4" />
+                </button>
+
+                <p className="text-[10px] text-center text-muted-foreground tracking-wider">
+                  No payment required at this stage. We'll confirm availability and pricing.
+                </p>
+              </form>
+            )}
+          </Reveal>
         </div>
       </section>
 
-      <section className="py-32 text-center bg-gradient-hero">
-        <Reveal>
-          <h2 className="font-display text-5xl md:text-7xl max-w-4xl mx-auto px-6 leading-tight">
-            Ready to be <br />
-            <em className="text-gradient-gold not-italic">immortalized?</em>
-          </h2>
-          <Link
-            to="/contact"
-            className="mt-10 inline-flex items-center gap-3 bg-gradient-gold text-black px-10 py-4 text-[11px] tracking-[0.3em] uppercase rounded-sm shadow-gold font-bold"
-          >
-            Book Your Scan <ArrowRight className="w-4 h-4" />
-          </Link>
-        </Reveal>
-      </section>
+      <style>{`
+        .input {
+          width: 100%;
+          background: var(--color-card);
+          border: 1px solid var(--color-border);
+          color: var(--color-foreground);
+          padding: 0.95rem 1rem;
+          border-radius: 4px;
+          font-size: 0.95rem;
+          transition: border-color 0.2s;
+          font-family: var(--font-sans);
+        }
+        .input:focus {
+          outline: none;
+          border-color: var(--color-gold);
+          box-shadow: 0 0 0 3px oklch(0.62 0.14 79 / 0.08);
+        }
+        .input::placeholder {
+          color: var(--color-muted-foreground);
+        }
+        select.input option {
+          background: white;
+          color: var(--color-foreground);
+        }
+      `}</style>
     </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2 font-medium">
+        {label}
+      </span>
+      {children}
+    </label>
   );
 }

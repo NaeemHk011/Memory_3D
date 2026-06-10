@@ -1,27 +1,38 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowRight, Phone, X } from "lucide-react";
+import { ArrowRight, Phone, X, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/Memory_3D_Logo (1) (3).png";
 
-const nav = [
-  { to: "/", label: "Home" },
-  { to: "/shop", label: "Shop" },
-  { to: "/about", label: "About Us" },
-  { to: "/contact", label: "Contact Us" },
-] as const;
+type NavItem =
+  | { label: string; to: string; external?: false }
+  | { label: string; href: string; external: true };
 
-const mobileNav = [
-  { to: "/" as const, label: "Home" },
-  { to: "/shop" as const, label: "Shop" },
-  { to: "/about" as const, label: "About Us" },
-  { to: "/contact" as const, label: "Contact Us" },
+const nav: NavItem[] = [
+  { label: "Home", to: "/" },
+  { label: "About Us", to: "/about" },
+  { label: "3D Crystals", to: "/shop" },
+  { label: "Acrylic Prints", to: "/acrylic-prints" },
+  { label: "Canvas Prints", to: "/canvas-prints" },
+  { label: "3D Sculptures", to: "/sculptures" },
+  { label: "Contact Us", to: "/contact" },
+];
+
+const mobileNav: NavItem[] = [
+  { label: "Home", to: "/" },
+  { label: "About Us", to: "/about" },
+  { label: "3D Crystals", to: "/shop" },
+  { label: "Acrylic Prints", to: "/acrylic-prints" },
+  { label: "Canvas Prints", to: "/canvas-prints" },
+  { label: "3D Sculptures", to: "/sculptures" },
+  { label: "Contact Us", to: "/contact" },
 ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(true);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -29,7 +40,6 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Lock body scroll when mobile menu open */
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -82,38 +92,45 @@ export function Header() {
             : "bg-white/85 backdrop-blur-xl"
         }`}
       >
-        {/* Thin gold accent stripe at very top */}
+        {/* Thin gold accent stripe */}
         <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-gold opacity-90" />
 
         <div className="max-w-7xl mx-auto px-5 lg:px-10 h-[68px] flex items-center justify-between gap-4">
 
           {/* ── Logo ── */}
           <Link to="/" className="shrink-0 flex items-center" aria-label="Memory3D Home">
-            <img
-              src={logo}
-              alt="Memory3D"
-              className="h-8 md:h-9 w-auto"
-            />
+            <img src={logo} alt="Memory3D" className="h-8 md:h-9 w-auto" />
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-10 xl:gap-14">
-            {nav.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                className="nav-link text-[11px] xl:text-[12px] tracking-[0.2em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
-                activeProps={{ className: "nav-link nav-link-active !text-gold" }}
-              >
-                {n.label}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-6 xl:gap-8">
+            {nav.map((n) =>
+              n.external ? (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="nav-link inline-flex items-center gap-1 text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+                >
+                  {n.label}
+                  <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                </a>
+              ) : (
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+                  activeProps={{ className: "nav-link nav-link-active !text-gold" }}
+                >
+                  {n.label}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* ── Right actions ── */}
           <div className="flex items-center gap-1.5 md:gap-3">
-
-            {/* Order Now -  pill CTA */}
             <Link
               to="/shop"
               className="btn-shine hidden sm:inline-flex items-center gap-2 pl-5 pr-4 py-2.5 text-[10px] tracking-[0.22em] uppercase bg-gradient-gold text-white rounded-full font-bold shadow-gold transition-all duration-300 hover:shadow-[0_8px_28px_-4px_oklch(0.62_0.14_79/0.55)] hover:-translate-y-px active:translate-y-0 active:scale-[0.98]"
@@ -124,7 +141,7 @@ export function Header() {
               </span>
             </Link>
 
-            {/* Animated hamburger */}
+            {/* Hamburger */}
             <button
               onClick={() => setOpen((v) => !v)}
               className="lg:hidden relative flex items-center justify-center w-9 h-9 rounded-full text-foreground/60 hover:text-gold hover:bg-gold/10 transition-all duration-200"
@@ -164,55 +181,61 @@ export function Header() {
             className="fixed inset-0 z-40 bg-white flex flex-col"
             style={{ paddingTop: bannerVisible ? "calc(34px + 68px)" : "68px" }}
           >
-            {/* Gold top accent replicated */}
             <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-gold" />
 
-            {/* Nav links */}
             <div className="flex-1 flex flex-col justify-center px-8 py-6 overflow-y-auto">
               <motion.ul
                 initial="hidden"
                 animate="show"
                 variants={{
                   hidden: {},
-                  show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+                  show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
                 }}
                 className="space-y-0"
               >
-                {mobileNav.map((n, i) => (
+                {mobileNav.map((n) => (
                   <motion.li
-                    key={n.to}
+                    key={n.external ? n.href : n.to}
                     variants={{
                       hidden: { opacity: 0, x: -24 },
                       show: { opacity: 1, x: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
                     }}
                   >
-                    <Link
-                      to={n.to}
-                      onClick={() => setOpen(false)}
-                      className="group flex items-center justify-between py-5 border-b border-border/60"
-                      activeProps={{}}
-                    >
-                      <span className="font-display text-[clamp(2rem,7vw,3rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
-                        {n.label}
-                      </span>
-                      <motion.div
-                        initial={{ opacity: 0, x: -8 }}
-                        whileHover={{ opacity: 1, x: 0 }}
-                        className="text-gold"
+                    {n.external ? (
+                      <a
+                        href={n.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setOpen(false)}
+                        className="group flex items-center justify-between py-4 border-b border-border/60"
                       >
-                        <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1" />
-                      </motion.div>
-                    </Link>
+                        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+                          {n.label}
+                        </span>
+                        <ExternalLink className="w-5 h-5 text-gold/50 group-hover:text-gold transition-colors" />
+                      </a>
+                    ) : (
+                      <Link
+                        to={n.to}
+                        onClick={() => setOpen(false)}
+                        className="group flex items-center justify-between py-4 border-b border-border/60"
+                        activeProps={{}}
+                      >
+                        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+                          {n.label}
+                        </span>
+                        <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
+                      </Link>
+                    )}
                   </motion.li>
                 ))}
               </motion.ul>
 
-              {/* CTA */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.38, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="mt-10"
+                transition={{ delay: 0.45, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-8"
               >
                 <Link
                   to="/shop"
@@ -227,7 +250,6 @@ export function Header() {
               </motion.div>
             </div>
 
-            {/* Bottom contact strip */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

@@ -64,6 +64,7 @@ export function CustomerForm({ onShippingChange, onFormChange }: CustomerFormPro
                 type="email"
                 placeholder="Enter your email address"
                 className="rounded-xl"
+                onChange={(e) => onFormChange({ email: e.target.value })}
               />
               <p className="text-[9px] text-muted-foreground italic">
                 We will notify you when your order is ready.
@@ -81,6 +82,7 @@ export function CustomerForm({ onShippingChange, onFormChange }: CustomerFormPro
                 type="tel"
                 placeholder="Enter your phone number"
                 className="rounded-xl"
+                onChange={(e) => onFormChange({ phone: e.target.value })}
               />
             </div>
           </div>

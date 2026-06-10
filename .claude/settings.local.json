@@ -4,7 +4,19 @@
       "Bash(npx tsc *)",
       "Bash(npm run *)",
       "Bash(python3 -c ' *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "WebFetch(domain:highlevel.stoplight.io)",
+      "WebSearch",
+      "WebFetch(domain:help.gohighlevel.com)",
+      "WebFetch(domain:marketplace.gohighlevel.com)",
+      "Bash(curl *)",
+      "Bash(vercel --version)",
+      "Bash(python -c ' *)",
+      "Bash(cp \"C:\\\\Users\\\\Administrator\\\\Downloads\\\\acrylic-print.png\" \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\TechGenics\\\\Memory_3D\\\\src\\\\assets\\\\banner-acrylic.png\")",
+      "Bash(cp \"C:\\\\Users\\\\Administrator\\\\Downloads\\\\canvas-prints.png\" \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\TechGenics\\\\Memory_3D\\\\src\\\\assets\\\\banner-canvas.png\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3001)",
+      "PowerShell(netstat *)"
     ]
   }
 }

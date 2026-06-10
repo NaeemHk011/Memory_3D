@@ -97,12 +97,35 @@ export function Configurator({ shape }: ConfiguratorProps) {
     const fields: string[] = [];
     if (!uploadedPhoto) fields.push("photo");
     if (!formData.name) fields.push("Full Name");
+    if (!formData.email) fields.push("Email");
+    if (!formData.phone) fields.push("Phone");
     return fields;
   }, [uploadedPhoto, formData]);
 
   const isReady = missingFields.length === 0;
 
-  const handleAddToCart = useCallback(() => {
+  const handleAddToCart = useCallback(async () => {
+    localStorage.setItem(
+      "customerData",
+      JSON.stringify({
+        name: formData.name || "",
+        email: formData.email || "",
+        phone: formData.phone || "",
+      }),
+    );
+
+    let photoBase64: string | undefined;
+    let photoName: string | undefined;
+    if (uploadedPhoto) {
+      photoName = uploadedPhoto.name;
+      photoBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(uploadedPhoto);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+    }
+
     addItem({
       id: crypto.randomUUID(),
       shapeId: shape.id,
@@ -111,6 +134,8 @@ export function Configurator({ shape }: ConfiguratorProps) {
       sizeLabel: selectedSize.label,
       price: totals.total,
       photo: uploadedPhoto ? URL.createObjectURL(uploadedPhoto) : "",
+      photoBase64,
+      photoName,
       addons: addons
         .filter((a) => selectedAddons[a.id]?.checked)
         .map((a) => ({
@@ -124,7 +149,7 @@ export function Configurator({ shape }: ConfiguratorProps) {
     });
     toast.success(`${shape.label} added to cart! We'll review your photo shortly.`);
     navigate({ to: "/cart" });
-  }, [shape, selectedSize, uploadedPhoto, selectedAddons, inscriptionText, addItem, navigate, totals.total]);
+  }, [shape, selectedSize, uploadedPhoto, selectedAddons, inscriptionText, addItem, navigate, totals.total, formData]);
 
   const startingPrice = Math.min(...shape.sizes.map((s) => s.price));
   const description = productDescriptions[shape.id] || "";
@@ -300,7 +325,10 @@ export function Configurator({ shape }: ConfiguratorProps) {
                 </span>
                 Your Details & Shipping
               </h2>
-              <CustomerForm onShippingChange={setShippingPrice} onFormChange={setFormData} />
+              <CustomerForm
+                onShippingChange={setShippingPrice}
+                onFormChange={(data) => setFormData((prev: any) => ({ ...prev, ...data }))}
+              />
             </section>
           </Reveal>
 

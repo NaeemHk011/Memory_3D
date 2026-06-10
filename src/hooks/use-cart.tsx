@@ -7,7 +7,9 @@ export interface CartItem {
   sizeId: string;
   sizeLabel: string;
   price: number;
-  photo: string; // URL
+  photo: string;
+  photoBase64?: string;
+  photoName?: string;
   addons: Array<{ id: string; label: string; price: number; qty: number }>;
   inscriptionText: string;
   quantity: number;

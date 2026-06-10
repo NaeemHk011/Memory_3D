@@ -16,6 +16,8 @@ import { Route as MemorialsRouteImport } from './routes/memorials'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CanvasPrintsRouteImport } from './routes/canvas-prints'
+import { Route as AcrylicPrintsRouteImport } from './routes/acrylic-prints'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopProductIdRouteImport } from './routes/shop.$productId'
@@ -55,6 +57,16 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CanvasPrintsRoute = CanvasPrintsRouteImport.update({
+  id: '/canvas-prints',
+  path: '/canvas-prints',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcrylicPrintsRoute = AcrylicPrintsRouteImport.update({
+  id: '/acrylic-prints',
+  path: '/acrylic-prints',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -74,6 +86,8 @@ const ShopProductIdRoute = ShopProductIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/acrylic-prints': typeof AcrylicPrintsRoute
+  '/canvas-prints': typeof CanvasPrintsRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -86,6 +100,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/acrylic-prints': typeof AcrylicPrintsRoute
+  '/canvas-prints': typeof CanvasPrintsRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -99,6 +115,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/acrylic-prints': typeof AcrylicPrintsRoute
+  '/canvas-prints': typeof CanvasPrintsRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -113,6 +131,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/acrylic-prints'
+    | '/canvas-prints'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -125,6 +145,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/acrylic-prints'
+    | '/canvas-prints'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -137,6 +159,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/acrylic-prints'
+    | '/canvas-prints'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -150,6 +174,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AcrylicPrintsRoute: typeof AcrylicPrintsRoute
+  CanvasPrintsRoute: typeof CanvasPrintsRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
@@ -210,6 +236,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/canvas-prints': {
+      id: '/canvas-prints'
+      path: '/canvas-prints'
+      fullPath: '/canvas-prints'
+      preLoaderRoute: typeof CanvasPrintsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acrylic-prints': {
+      id: '/acrylic-prints'
+      path: '/acrylic-prints'
+      fullPath: '/acrylic-prints'
+      preLoaderRoute: typeof AcrylicPrintsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -247,6 +287,8 @@ const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AcrylicPrintsRoute: AcrylicPrintsRoute,
+  CanvasPrintsRoute: CanvasPrintsRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
