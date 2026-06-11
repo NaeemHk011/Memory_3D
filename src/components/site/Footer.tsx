@@ -29,18 +29,28 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link to="/shop" className="hover:text-gold transition-colors">
-                  All Products
+                  3D Crystals
                 </Link>
               </li>
               <li>
-                <Link to="/weddings" className="hover:text-gold transition-colors">
-                  Weddings
-                </Link>
+                <a
+                  href="https://www.easycanvasprints.com/acrylic-prints"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gold transition-colors"
+                >
+                  Acrylic Prints
+                </a>
               </li>
               <li>
-                <Link to="/memorials" className="hover:text-gold transition-colors">
-                  Memorials
-                </Link>
+                <a
+                  href="https://www.easycanvasprints.com/canvas-prints"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gold transition-colors"
+                >
+                  Canvas Prints
+                </a>
               </li>
               <li>
                 <Link to="/sculptures" className="hover:text-gold transition-colors">

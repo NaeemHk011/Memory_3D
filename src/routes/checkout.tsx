@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { AffiliateBanner } from "@/components/site/AffiliateBanner";
 import { useCart } from "@/hooks/use-cart";
 
 export const Route = createFileRoute("/checkout")({
@@ -270,8 +271,12 @@ function ThankYouView() {
           </div>
         </Reveal>
 
-        <Reveal delay={0.2}>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <Reveal delay={0.18}>
+          <AffiliateBanner />
+        </Reveal>
+
+        <Reveal delay={0.25}>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
             <Link to="/">
               <Button className="w-full sm:w-auto bg-gradient-gold text-primary-foreground px-10 py-6 text-[11px] tracking-[0.3em] uppercase rounded-sm shadow-gold">
                 Return to Home

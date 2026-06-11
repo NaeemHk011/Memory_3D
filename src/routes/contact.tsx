@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Reveal } from "@/components/site/Reveal";
+import { AffiliateBanner } from "@/components/site/AffiliateBanner";
 import { Mail, Phone, MapPin, Calendar, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
@@ -101,6 +102,7 @@ function Contact() {
             <div className="bg-card border border-border rounded-sm shadow-sm overflow-hidden p-2">
               <ContactForm />
             </div>
+            <AffiliateBanner />
           </Reveal>
 
           {/* ── Contact Info ── */}
