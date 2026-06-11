@@ -71,6 +71,11 @@ export function Footer() {
                   Schedule a Scan
                 </Link>
               </li>
+              <li>
+                <Link to="/affiliates" className="hover:text-gold transition-colors">
+                  Affiliates
+                </Link>
+              </li>
             </ul>
           </div>
 

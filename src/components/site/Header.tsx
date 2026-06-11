@@ -1,32 +1,166 @@
 import { Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { ArrowRight, Phone, X, ExternalLink } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ArrowRight, Phone, X, ChevronDown, Gem, Frame, Box, Layers } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/Memory_3D_Logo (1) (3).png";
 
-type NavItem =
-  | { label: string; to: string; external?: false }
-  | { label: string; href: string; external: true };
+type SimpleNavItem = { label: string; to: string };
+type DropdownItem = { label: string; to: string; icon: React.ElementType; desc: string };
 
-const nav: NavItem[] = [
-  { label: "Home", to: "/" },
-  { label: "About Us", to: "/about" },
-  { label: "3D Crystals", to: "/shop" },
-  { label: "Acrylic Prints", to: "/acrylic-prints" },
-  { label: "Canvas Prints", to: "/canvas-prints" },
-  { label: "3D Sculptures", to: "/sculptures" },
+const collections: DropdownItem[] = [
+  { label: "3D Crystals",     to: "/shop",           icon: Gem,    desc: "Laser-engraved photo crystals" },
+  { label: "Acrylic Prints",  to: "/acrylic-prints", icon: Frame,  desc: "Premium wall-ready prints" },
+  { label: "Canvas Prints",   to: "/canvas-prints",  icon: Layers, desc: "Gallery-quality canvas art" },
+  { label: "3D Sculptures",   to: "/sculptures",     icon: Box,    desc: "Full-color 3D figurines" },
+];
+
+const primaryNav: SimpleNavItem[] = [
+  { label: "Home",       to: "/" },
+  { label: "About Us",   to: "/about" },
+  { label: "Affiliates", to: "/affiliates" },
   { label: "Contact Us", to: "/contact" },
 ];
 
-const mobileNav: NavItem[] = [
-  { label: "Home", to: "/" },
-  { label: "About Us", to: "/about" },
+const mobileNav: SimpleNavItem[] = [
+  { label: "Home",        to: "/" },
+  { label: "About Us",    to: "/about" },
   { label: "3D Crystals", to: "/shop" },
   { label: "Acrylic Prints", to: "/acrylic-prints" },
-  { label: "Canvas Prints", to: "/canvas-prints" },
-  { label: "3D Sculptures", to: "/sculptures" },
-  { label: "Contact Us", to: "/contact" },
+  { label: "Canvas Prints",  to: "/canvas-prints" },
+  { label: "3D Sculptures",  to: "/sculptures" },
+  { label: "Affiliates",  to: "/affiliates" },
+  { label: "Contact Us",  to: "/contact" },
 ];
+
+function CollectionsDropdown() {
+  const [open, setOpen] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const show = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setOpen(true);
+  };
+  const hide = () => {
+    timeoutRef.current = setTimeout(() => setOpen(false), 120);
+  };
+
+  return (
+    <div className="relative" onMouseEnter={show} onMouseLeave={hide}>
+      <button
+        className="nav-link inline-flex items-center gap-1 text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        Collections
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <ChevronDown className="w-3 h-3" />
+        </motion.span>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.97 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            onMouseEnter={show}
+            onMouseLeave={hide}
+            className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[340px] bg-white/98 backdrop-blur-2xl border border-border rounded-sm shadow-[0_8px_40px_-8px_oklch(0_0_0/0.12),0_2px_8px_-2px_oklch(0_0_0/0.06)] overflow-hidden z-50"
+          >
+            {/* Gold top accent */}
+            <div className="h-[2px] bg-gradient-gold" />
+
+            <div className="p-2">
+              {collections.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="group flex items-center gap-4 px-3 py-3 rounded-[3px] hover:bg-gold/5 transition-colors duration-150"
+                >
+                  <span className="flex-shrink-0 w-9 h-9 grid place-items-center rounded-sm bg-gold/8 border border-gold/15 group-hover:bg-gold/15 group-hover:border-gold/30 transition-colors duration-150">
+                    <item.icon className="w-4 h-4 text-gold" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] tracking-[0.12em] uppercase font-semibold text-foreground group-hover:text-gold transition-colors duration-150">
+                      {item.label}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{item.desc}</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-gold/0 group-hover:text-gold/70 ml-auto flex-shrink-0 -translate-x-1 group-hover:translate-x-0 transition-all duration-200" />
+                </Link>
+              ))}
+            </div>
+
+            <div className="border-t border-border/60 px-5 py-3 bg-card/60">
+              <Link
+                to="/shop"
+                className="text-[10px] tracking-[0.22em] uppercase font-semibold text-gold hover:text-gold/70 transition-colors inline-flex items-center gap-1.5"
+              >
+                View all products
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MobileCollectionsAccordion({ onClose }: { onClose: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <motion.li
+      variants={{
+        hidden: { opacity: 0, x: -24 },
+        show: { opacity: 1, x: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
+      }}
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="group w-full flex items-center justify-between py-4 border-b border-border/60"
+      >
+        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+          Collections
+        </span>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }}>
+          <ChevronDown className="w-5 h-5 text-gold" />
+        </motion.span>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-b border-border/60"
+          >
+            {collections.map((item) => (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  onClick={onClose}
+                  className="flex items-center gap-3 py-3 pl-4 text-foreground/70 hover:text-gold transition-colors duration-150 group"
+                >
+                  <span className="w-7 h-7 grid place-items-center rounded-sm bg-gold/8 border border-gold/15 flex-shrink-0">
+                    <item.icon className="w-3.5 h-3.5 text-gold" />
+                  </span>
+                  <span className="font-display text-[1.35rem] leading-tight group-hover:text-gold transition-colors">
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </motion.li>
+  );
+}
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -103,30 +237,30 @@ export function Header() {
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-6 xl:gap-8">
-            {nav.map((n) =>
-              n.external ? (
-                <a
-                  key={n.href}
-                  href={n.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="nav-link inline-flex items-center gap-1 text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
-                >
-                  {n.label}
-                  <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-                </a>
-              ) : (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
-                  activeProps={{ className: "nav-link nav-link-active !text-gold" }}
-                >
-                  {n.label}
-                </Link>
-              )
-            )}
+          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 xl:gap-9">
+            {primaryNav.slice(0, 2).map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+                activeProps={{ className: "nav-link nav-link-active !text-gold" }}
+              >
+                {n.label}
+              </Link>
+            ))}
+
+            <CollectionsDropdown />
+
+            {primaryNav.slice(2).map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+                activeProps={{ className: "nav-link nav-link-active !text-gold" }}
+              >
+                {n.label}
+              </Link>
+            ))}
           </nav>
 
           {/* ── Right actions ── */}
@@ -193,40 +327,52 @@ export function Header() {
                 }}
                 className="space-y-0"
               >
-                {mobileNav.map((n) => (
+                {/* Home & About */}
+                {mobileNav.slice(0, 2).map((n) => (
                   <motion.li
-                    key={n.external ? n.href : n.to}
+                    key={n.to}
                     variants={{
                       hidden: { opacity: 0, x: -24 },
                       show: { opacity: 1, x: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
                     }}
                   >
-                    {n.external ? (
-                      <a
-                        href={n.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setOpen(false)}
-                        className="group flex items-center justify-between py-4 border-b border-border/60"
-                      >
-                        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
-                          {n.label}
-                        </span>
-                        <ExternalLink className="w-5 h-5 text-gold/50 group-hover:text-gold transition-colors" />
-                      </a>
-                    ) : (
-                      <Link
-                        to={n.to}
-                        onClick={() => setOpen(false)}
-                        className="group flex items-center justify-between py-4 border-b border-border/60"
-                        activeProps={{}}
-                      >
-                        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
-                          {n.label}
-                        </span>
-                        <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
-                      </Link>
-                    )}
+                    <Link
+                      to={n.to}
+                      onClick={() => setOpen(false)}
+                      className="group flex items-center justify-between py-4 border-b border-border/60"
+                      activeProps={{}}
+                    >
+                      <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+                        {n.label}
+                      </span>
+                      <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
+                    </Link>
+                  </motion.li>
+                ))}
+
+                {/* Collections accordion */}
+                <MobileCollectionsAccordion onClose={() => setOpen(false)} />
+
+                {/* Affiliates & Contact */}
+                {mobileNav.slice(6).map((n) => (
+                  <motion.li
+                    key={n.to}
+                    variants={{
+                      hidden: { opacity: 0, x: -24 },
+                      show: { opacity: 1, x: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
+                    }}
+                  >
+                    <Link
+                      to={n.to}
+                      onClick={() => setOpen(false)}
+                      className="group flex items-center justify-between py-4 border-b border-border/60"
+                      activeProps={{}}
+                    >
+                      <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+                        {n.label}
+                      </span>
+                      <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
+                    </Link>
                   </motion.li>
                 ))}
               </motion.ul>

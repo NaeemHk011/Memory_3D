@@ -17,6 +17,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CanvasPrintsRouteImport } from './routes/canvas-prints'
+import { Route as AffiliatesRouteImport } from './routes/affiliates'
 import { Route as AcrylicPrintsRouteImport } from './routes/acrylic-prints'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -62,6 +63,11 @@ const CanvasPrintsRoute = CanvasPrintsRouteImport.update({
   path: '/canvas-prints',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffiliatesRoute = AffiliatesRouteImport.update({
+  id: '/affiliates',
+  path: '/affiliates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AcrylicPrintsRoute = AcrylicPrintsRouteImport.update({
   id: '/acrylic-prints',
   path: '/acrylic-prints',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/acrylic-prints': typeof AcrylicPrintsRoute
+  '/affiliates': typeof AffiliatesRoute
   '/canvas-prints': typeof CanvasPrintsRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/acrylic-prints': typeof AcrylicPrintsRoute
+  '/affiliates': typeof AffiliatesRoute
   '/canvas-prints': typeof CanvasPrintsRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/acrylic-prints': typeof AcrylicPrintsRoute
+  '/affiliates': typeof AffiliatesRoute
   '/canvas-prints': typeof CanvasPrintsRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/acrylic-prints'
+    | '/affiliates'
     | '/canvas-prints'
     | '/cart'
     | '/checkout'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/acrylic-prints'
+    | '/affiliates'
     | '/canvas-prints'
     | '/cart'
     | '/checkout'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/acrylic-prints'
+    | '/affiliates'
     | '/canvas-prints'
     | '/cart'
     | '/checkout'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AcrylicPrintsRoute: typeof AcrylicPrintsRoute
+  AffiliatesRoute: typeof AffiliatesRoute
   CanvasPrintsRoute: typeof CanvasPrintsRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CanvasPrintsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/affiliates': {
+      id: '/affiliates'
+      path: '/affiliates'
+      fullPath: '/affiliates'
+      preLoaderRoute: typeof AffiliatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/acrylic-prints': {
       id: '/acrylic-prints'
       path: '/acrylic-prints'
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AcrylicPrintsRoute: AcrylicPrintsRoute,
+  AffiliatesRoute: AffiliatesRoute,
   CanvasPrintsRoute: CanvasPrintsRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
