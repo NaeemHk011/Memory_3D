@@ -39,6 +39,8 @@ function CheckoutPage() {
             shapeLabel: item.shapeLabel,
             sizeLabel: item.sizeLabel,
             price: item.price,
+            addons: item.addons,
+            inscriptionText: item.inscriptionText,
           })),
           totalPrice,
           photoBase64: firstPhoto?.photoBase64 || null,
@@ -112,21 +114,30 @@ function CheckoutPage() {
             <h2 className="text-[12px] tracking-[0.2em] uppercase font-bold text-gold border-b border-gold/20 pb-3 mb-6">
               Order Items
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between items-center">
-                  <div>
+                <div key={item.id} className="flex justify-between items-start gap-4">
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{item.shapeLabel}</p>
                     <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
                       Size: {item.sizeLabel}
                     </p>
                     {item.addons.length > 0 && (
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        + {item.addons.map((a) => a.label).join(", ")}
+                      <div className="mt-2 space-y-0.5">
+                        {item.addons.map((a) => (
+                          <p key={a.id} className="text-[10px] text-muted-foreground">
+                            + {a.label}{a.qty > 1 ? ` ×${a.qty}` : ""}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                    {item.inscriptionText && (
+                      <p className="text-[10px] text-muted-foreground mt-1 italic">
+                        "{item.inscriptionText}"
                       </p>
                     )}
                   </div>
-                  <span className="font-display text-xl text-gold font-bold">
+                  <span className="font-display text-xl text-gold font-bold shrink-0">
                     ${item.price.toFixed(2)}
                   </span>
                 </div>
