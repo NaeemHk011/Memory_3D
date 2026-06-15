@@ -1,19 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowRight, Phone, X, ExternalLink } from "lucide-react";
+import { ArrowRight, Phone, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/Memory_3D_Logo (1) (3).png";
 
-type NavItem =
-  | { label: string; to: string; external?: false }
-  | { label: string; href: string; external: true };
+type NavItem = { label: string; to: string };
 
 const nav: NavItem[] = [
   { label: "Home",           to: "/" },
   { label: "About Us",       to: "/about" },
   { label: "3D Crystals",    to: "/shop" },
-  { label: "Acrylic Prints", href: "https://www.easycanvasprints.com/acrylic-prints", external: true },
-  { label: "Canvas Prints",  href: "https://www.easycanvasprints.com/canvas-prints",  external: true },
+  { label: "Acrylic Prints", to: "/acrylic-prints" },
+  { label: "Canvas Prints",  to: "/canvas-prints" },
   { label: "3D Sculptures",  to: "/sculptures" },
   { label: "Contact Us",     to: "/contact" },
 ];
@@ -22,8 +20,8 @@ const mobileNav: NavItem[] = [
   { label: "Home",           to: "/" },
   { label: "About Us",       to: "/about" },
   { label: "3D Crystals",    to: "/shop" },
-  { label: "Acrylic Prints", href: "https://www.easycanvasprints.com/acrylic-prints", external: true },
-  { label: "Canvas Prints",  href: "https://www.easycanvasprints.com/canvas-prints",  external: true },
+  { label: "Acrylic Prints", to: "/acrylic-prints" },
+  { label: "Canvas Prints",  to: "/canvas-prints" },
   { label: "3D Sculptures",  to: "/sculptures" },
   { label: "Contact Us",     to: "/contact" },
 ];
@@ -104,29 +102,16 @@ export function Header() {
 
           {/* ── Desktop Nav ── */}
           <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 xl:gap-7">
-            {nav.map((n) =>
-              n.external ? (
-                <a
-                  key={n.href}
-                  href={n.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="nav-link inline-flex items-center gap-1 text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
-                >
-                  {n.label}
-                  <ExternalLink className="w-2.5 h-2.5 opacity-50" />
-                </a>
-              ) : (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
-                  activeProps={{ className: "nav-link nav-link-active !text-gold" }}
-                >
-                  {n.label}
-                </Link>
-              )
-            )}
+            {nav.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+                activeProps={{ className: "nav-link nav-link-active !text-gold" }}
+              >
+                {n.label}
+              </Link>
+            ))}
           </nav>
 
           {/* ── Right actions ── */}
@@ -195,38 +180,23 @@ export function Header() {
               >
                 {mobileNav.map((n) => (
                   <motion.li
-                    key={n.external ? n.href : n.to}
+                    key={n.to}
                     variants={{
                       hidden: { opacity: 0, x: -24 },
                       show: { opacity: 1, x: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] } },
                     }}
                   >
-                    {n.external ? (
-                      <a
-                        href={n.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setOpen(false)}
-                        className="group flex items-center justify-between py-4 border-b border-border/60"
-                      >
-                        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
-                          {n.label}
-                        </span>
-                        <ExternalLink className="w-5 h-5 text-gold/50 group-hover:text-gold transition-colors" />
-                      </a>
-                    ) : (
-                      <Link
-                        to={n.to}
-                        onClick={() => setOpen(false)}
-                        className="group flex items-center justify-between py-4 border-b border-border/60"
-                        activeProps={{}}
-                      >
-                        <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
-                          {n.label}
-                        </span>
-                        <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
-                      </Link>
-                    )}
+                    <Link
+                      to={n.to}
+                      onClick={() => setOpen(false)}
+                      className="group flex items-center justify-between py-4 border-b border-border/60"
+                      activeProps={{}}
+                    >
+                      <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+                        {n.label}
+                      </span>
+                      <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
+                    </Link>
                   </motion.li>
                 ))}
               </motion.ul>

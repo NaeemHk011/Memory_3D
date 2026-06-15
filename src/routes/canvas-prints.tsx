@@ -430,12 +430,6 @@ function CanvasPrintsPage() {
                   <div className="p-6">
                     <h3 className="font-display text-xl text-foreground mb-2">{f.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
-                    <Link
-                      to="/contact"
-                      className="mt-4 inline-flex items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase font-bold text-gold hover:opacity-70 transition-opacity"
-                    >
-                      Get Started <ArrowRight className="w-3 h-3" />
-                    </Link>
                   </div>
                 </div>
               </Reveal>
