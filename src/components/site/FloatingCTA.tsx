@@ -60,7 +60,7 @@ export function FloatingCTA() {
 
             {/* Sub text */}
             <p className="text-[11px] text-white/38 leading-relaxed mb-5">
-              3D crystals, acrylic prints, canvas &amp; sculptures — gift-ready in 10–14 days.
+              3D crystals, acrylic prints, canvas &amp; sculptures    gift-ready in 10–14 days.
             </p>
 
             {/* CTA buttons */}

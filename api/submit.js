@@ -1,4 +1,4 @@
-// api/submit.js — Memory3D order submission handler
+// api/submit.js    Memory3D order submission handler
 // Uploads photo → creates GHL contact → creates GHL opportunity → adds full order note (addons included)
 
 const GHL_BASE = "https://rest.gohighlevel.com/v1";
@@ -55,7 +55,7 @@ async function createGHLContact({ name, email, phone }) {
 }
 
 async function createGHLOpportunity({ contactId, name, totalPrice, firstItemLabel }) {
-  const opportunityName = `${name} — ${firstItemLabel || "3D Crystal"} Order`;
+  const opportunityName = `${name}    ${firstItemLabel || "3D Crystal"} Order`;
   const res = await fetch(`${GHL_BASE}/pipelines/${process.env.GHL_PIPELINE_ID}/opportunities`, {
     method: "POST",
     headers: ghlHeaders(),
@@ -93,7 +93,7 @@ function buildOrderNote({ name, email, phone, cartItems, totalPrice, photoUrl })
   ];
 
   for (const item of cartItems || []) {
-    lines.push(`  • ${item.shapeLabel} — ${item.sizeLabel}   $${Number(item.price).toFixed(2)}`);
+    lines.push(`  • ${item.shapeLabel}    ${item.sizeLabel}   $${Number(item.price).toFixed(2)}`);
 
     if (item.addons && item.addons.length > 0) {
       for (const addon of item.addons) {

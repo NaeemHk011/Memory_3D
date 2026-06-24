@@ -124,7 +124,7 @@ function Affiliates() {
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl font-light leading-relaxed">
               Love our crystals? Share them. Refer customers to Memory3D and earn
-              commissions on every sale — no minimums, no hassle.
+              commissions on every sale    no minimums, no hassle.
             </p>
           </Reveal>
 
@@ -209,7 +209,7 @@ function Affiliates() {
       <section id="join" className="py-24 scroll-mt-24">
         <div className="max-w-6xl mx-auto px-6 lg:px-10 grid lg:grid-cols-[1fr_1.5fr] gap-16 items-start">
 
-          {/* Left — info panel */}
+          {/* Left    info panel */}
           <Reveal>
             <div className="lg:sticky lg:top-32 space-y-8">
               <div>
@@ -263,7 +263,7 @@ function Affiliates() {
             </div>
           </Reveal>
 
-          {/* Right — iframe form */}
+          {/* Right    iframe form */}
           <Reveal delay={0.15}>
             <div className="bg-card border border-border rounded-sm shadow-sm overflow-hidden p-2">
               <AffiliateForm />

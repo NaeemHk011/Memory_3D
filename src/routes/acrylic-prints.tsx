@@ -40,7 +40,7 @@ const featureCards = [
   {
     img: imgHang,
     title: "Ready to Hang",
-    body: "Hassle-free installation — our acrylic prints come with a wood block on the back creating a floating effect.",
+    body: "Hassle-free installation    our acrylic prints come with a wood block on the back creating a floating effect.",
   },
   {
     img: imgQuality,
@@ -325,7 +325,7 @@ function AcrylicConfigurator() {
           {status === "loading" ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
           ) : (
-            <>Order Now — {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
+            <>Order Now    {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
           )}
         </button>
         <p className="text-[10px] text-center text-muted-foreground tracking-wider">
@@ -384,7 +384,7 @@ function AcrylicPrintsPage() {
               Make It Your Own
             </h2>
             <p className="text-center text-muted-foreground max-w-xl mx-auto mb-16">
-              Every acrylic print is made to order — crafted to the exact specifications of your photo and size.
+              Every acrylic print is made to order    crafted to the exact specifications of your photo and size.
             </p>
           </Reveal>
 
@@ -463,7 +463,7 @@ function AcrylicPrintsPage() {
             <em className="text-gradient-gold not-italic">Acrylic Print</em>
           </h2>
           <p className="mt-6 text-muted-foreground max-w-md mx-auto">
-            Upload your photo, choose your size, and we'll handle the rest — shipped to your door in 10–14 days.
+            Upload your photo, choose your size, and we'll handle the rest    shipped to your door in 10–14 days.
           </p>
           <Link
             to="/contact"

@@ -53,17 +53,17 @@ import pWood from "@/assets/product-wooden-premium.webp";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Memory3D — Forever in Crystal | 3D Laser-Engraved Gifts" },
+      { title: "Memory3D    Forever in Crystal | 3D Laser-Engraved Gifts" },
       {
         name: "description",
         content:
           "Turn your most precious moments into stunning 3D laser-engraved crystals, acrylic prints, canvas art, and full-color sculptures. Preserved forever.",
       },
-      { property: "og:title", content: "Memory3D — Forever in Crystal" },
+      { property: "og:title", content: "Memory3D    Forever in Crystal" },
       {
         property: "og:description",
         content:
-          "Premium 3D crystals, acrylic prints, canvas prints, and sculptures — personalized for the moments that matter.",
+          "Premium 3D crystals, acrylic prints, canvas prints, and sculptures    personalized for the moments that matter.",
       },
       { property: "og:image", content: heroCover },
     ],
@@ -120,7 +120,7 @@ const services = [
     to: "/sculptures",
     img: crystalHero,
     tagline: "You, In Miniature",
-    desc: "Full-color 3D figurines capturing every detail. Families, pets, couples — scanned in just 12 seconds.",
+    desc: "Full-color 3D figurines capturing every detail. Families, pets, couples    scanned in just 12 seconds.",
     from: "$199",
     features: ["Scanned in 12 seconds", "Full-color detail", "Hand-finished figurine"],
   },
@@ -216,7 +216,7 @@ function Home() {
               </h1>
 
               <p className="mt-8 text-[14px] md:text-[15px] text-white/55 max-w-lg leading-relaxed font-light">
-                3D laser-engraved crystals, acrylic prints, canvas art, and full-color sculptures —
+                3D laser-engraved crystals, acrylic prints, canvas art, and full-color sculptures   
                 crafted from your photos and delivered gift-ready in 10–14 days.
               </p>
 
@@ -386,7 +386,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ══════════════════ STATS — BOLD & BRIGHT ══════════════════ */}
+      {/* ══════════════════ STATS    BOLD & BRIGHT ══════════════════ */}
       <section className="py-28 bg-background relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[300px] rounded-full bg-gold/[0.06] blur-[100px]" />
@@ -410,7 +410,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ══════════════════ OCCASIONS — ASYMMETRIC GRID ══════════════════ */}
+      {/* ══════════════════ OCCASIONS    ASYMMETRIC GRID ══════════════════ */}
       <section className="py-28 bg-background relative overflow-hidden">
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[700px] rounded-full bg-gold/[0.04] blur-[130px] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 lg:px-10 relative">
@@ -425,7 +425,7 @@ function Home() {
                 </h2>
               </div>
               <p className="text-muted-foreground text-[13px] max-w-xs leading-relaxed">
-                From wedding halls to memorial shelves — every milestone deserves to be preserved in light.
+                From wedding halls to memorial shelves    every milestone deserves to be preserved in light.
               </p>
             </div>
           </Reveal>
@@ -625,11 +625,11 @@ function Home() {
                 </h2>
                 <p className="mt-6 text-[14px] text-muted-foreground leading-relaxed max-w-md">
                   Place your crystal on one of our premium LED lightbases and watch your memory
-                  come alive. Rotating platforms, colour-changing bases — every angle reveals something new.
+                  come alive. Rotating platforms, colour-changing bases    every angle reveals something new.
                 </p>
                 <ul className="mt-8 space-y-4">
                   {[
-                    "360° rotating lightbase — never the same angle twice",
+                    "360° rotating lightbase    never the same angle twice",
                     "Warm LED glow enhances every engraved detail",
                     "Available in silver, wooden & colour-changing finishes",
                     "Pairs with any crystal shape in our collection",
@@ -669,7 +669,7 @@ function Home() {
                 Down to the last freckle.
               </h2>
               <p className="mt-6 text-[14px] text-muted-foreground leading-relaxed max-w-lg">
-                Step into our scanner. In twelve seconds we capture every detail — your favourite
+                Step into our scanner. In twelve seconds we capture every detail    your favourite
                 jacket, your dog mid-tail-wag, the way you hold your kid. A hand-finished, full-color
                 figurine you'll keep on your shelf forever.
               </p>
@@ -793,7 +793,7 @@ function Home() {
               <ul className="mt-8 space-y-4">
                 {[
                   { icon: Calendar, t: "Same-day appointments" },
-                  { icon: Heart,    t: "Pets, kids, couples — all welcome" },
+                  { icon: Heart,    t: "Pets, kids, couples    all welcome" },
                   { icon: Trophy,   t: "Sports teams & corporate events" },
                   { icon: Gift,     t: "Sculptures and crystals from one scan" },
                 ].map(({ icon: I, t }) => (

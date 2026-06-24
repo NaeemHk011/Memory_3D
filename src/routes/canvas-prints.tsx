@@ -41,7 +41,7 @@ const featureCards = [
   {
     img: imgFrames,
     title: "Customizable Frames",
-    body: "Accentuate your canvas with a decorative frame for any style — from our extensive collection. Level up your canvas prints today.",
+    body: "Accentuate your canvas with a decorative frame for any style    from our extensive collection. Level up your canvas prints today.",
   },
   {
     img: imgHang,
@@ -76,7 +76,7 @@ const productDetails = [
   },
   {
     label: "Canvas Framing",
-    desc: "Canvas prints are available with optional frames ranging from 1.25\" to 3\" depth — choose the profile that suits your wall and style.",
+    desc: "Canvas prints are available with optional frames ranging from 1.25\" to 3\" depth    choose the profile that suits your wall and style.",
   },
   {
     label: "Gallery Quality",
@@ -91,7 +91,7 @@ const faqs = [
   },
   {
     q: "How do I clean my canvas print?",
-    a: "Use a soft, dry microfibre cloth to gently dust the surface. For stubborn spots, lightly dampen the cloth — never apply liquid directly to the canvas. Avoid harsh chemicals or abrasive materials.",
+    a: "Use a soft, dry microfibre cloth to gently dust the surface. For stubborn spots, lightly dampen the cloth    never apply liquid directly to the canvas. Avoid harsh chemicals or abrasive materials.",
   },
   {
     q: "Will my finished canvas look like the image on my computer screen?",
@@ -351,7 +351,7 @@ function CanvasConfigurator() {
           {status === "loading" ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
           ) : (
-            <>Order Now — {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
+            <>Order Now    {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
           )}
         </button>
         <p className="text-[10px] text-center text-muted-foreground tracking-wider">
@@ -412,7 +412,7 @@ function CanvasPrintsPage() {
               Make It Your Own
             </h2>
             <p className="text-center text-muted-foreground max-w-xl mx-auto mb-16">
-              Every canvas is made to order — tailored to your photo, your size, and your frame choice.
+              Every canvas is made to order    tailored to your photo, your size, and your frame choice.
             </p>
           </Reveal>
 
@@ -519,7 +519,7 @@ function CanvasPrintsPage() {
             <em className="text-gradient-gold not-italic">Your Canvas?</em>
           </h2>
           <p className="mt-6 text-muted-foreground max-w-md mx-auto">
-            Upload your photo, pick your size and frame, and we'll handle the rest — delivered in premium packaging.
+            Upload your photo, pick your size and frame, and we'll handle the rest    delivered in premium packaging.
           </p>
           <Link
             to="/contact"

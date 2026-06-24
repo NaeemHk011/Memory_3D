@@ -173,13 +173,13 @@ function CheckoutPage() {
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     Email
                   </span>
-                  <span className="text-sm text-foreground">{customerData.email || "—"}</span>
+                  <span className="text-sm text-foreground">{customerData.email || "  "}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     Phone
                   </span>
-                  <span className="text-sm text-foreground">{customerData.phone || "—"}</span>
+                  <span className="text-sm text-foreground">{customerData.phone || "  "}</span>
                 </div>
               </div>
             ) : (
