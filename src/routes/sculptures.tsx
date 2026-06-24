@@ -4,6 +4,12 @@ import { Reveal } from "@/components/site/Reveal";
 import { AffiliateBanner } from "@/components/site/AffiliateBanner";
 import { ArrowRight } from "lucide-react";
 
+import sculpturesCover1 from "@/assets/Memory3D_Sculptures_1.avif";
+import s1 from "@/assets/3D-Sculp-1.avif";
+import s2 from "@/assets/3D-Sculp-2.avif";
+import s4 from "@/assets/3D-Sculp-4.jpg";
+import s5 from "@/assets/3D-Sculp-5.jpg";
+
 export const Route = createFileRoute("/sculptures")({
   head: () => ({
     meta: [
@@ -91,6 +97,39 @@ function SculpturesPage() {
               </a>
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      {/* ── Gallery ── */}
+      <section className="py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <Reveal>
+            <div className="text-center mb-12">
+              <span className="text-[10px] tracking-[0.38em] uppercase text-gold font-semibold">Our Work</span>
+              <h2 className="font-display font-semibold text-[clamp(2rem,4vw,3.2rem)] text-foreground mt-3">
+                Every detail, <em className="text-gradient-gold not-italic">preserved.</em>
+              </h2>
+            </div>
+          </Reveal>
+
+          {/* Main large + grid layout */}
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-4 mb-4">
+            <Reveal>
+              <div className="rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-auto lg:h-[480px] border border-border shadow-card">
+                <img src={sculpturesCover1} alt="3D Sculpture" className="w-full h-full object-cover object-[center_10%]" />
+              </div>
+            </Reveal>
+            <div className="grid grid-cols-2 gap-4">
+              {[s4, s1, s5, s2].map((src, i) => (
+                <Reveal key={i} delay={i * 0.07}>
+                  <div className="rounded-2xl overflow-hidden aspect-square border border-border shadow-card">
+                    <img src={src} alt="3D Sculpture" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 

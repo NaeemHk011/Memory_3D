@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowRight, Phone, X } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/Memory_3D_Logo (1) (3).png";
 
@@ -29,7 +29,6 @@ const mobileNav: NavItem[] = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [bannerVisible, setBannerVisible] = useState(true);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -51,43 +50,14 @@ export function Header() {
 
   return (
     <>
-      {/* ══════════════ ANNOUNCEMENT BANNER ══════════════ */}
-      <AnimatePresence>
-        {bannerVisible && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-0 inset-x-0 z-[60] bg-gradient-gold overflow-hidden"
-          >
-            <div className="max-w-7xl mx-auto px-4 h-[34px] flex items-center justify-between">
-              <div className="flex-1" />
-              <p className="text-white text-[9.5px] tracking-[0.32em] uppercase font-bold text-center flex-[3]">
-                ✦ &nbsp; Free Shipping on Orders Over $100 &nbsp;·&nbsp; Ships in 10–14 Days &nbsp; ✦
-              </p>
-              <div className="flex-1 flex justify-end">
-                <button
-                  onClick={() => setBannerVisible(false)}
-                  className="text-white/70 hover:text-white transition-colors p-1"
-                  aria-label="Dismiss announcement"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* ══════════════ MAIN HEADER ══════════════ */}
       <motion.header
-        animate={{ top: bannerVisible ? 34 : 0 }}
+        animate={{ top: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className={`fixed inset-x-0 z-50 transition-[background,box-shadow] duration-500 ${
+        className={`fixed inset-x-0 z-50 transition-[background,box-shadow,border-color] duration-500 ${
           scrolled
-            ? "bg-white/98 backdrop-blur-2xl shadow-[0_1px_0_0_oklch(0.87_0.006_80/0.6),0_6px_24px_-6px_oklch(0_0_0/0.07)]"
-            : "bg-white/85 backdrop-blur-xl"
+            ? "bg-[#0a0a0a]/98 backdrop-blur-2xl shadow-[0_1px_0_0_oklch(0.62_0.14_79/0.25),0_8px_32px_-8px_oklch(0_0_0/0.55)] border-b border-white/[0.06]"
+            : "bg-[#0a0a0a]/88 backdrop-blur-xl border-b border-transparent"
         }`}
       >
         {/* Thin gold accent stripe */}
@@ -97,16 +67,16 @@ export function Header() {
 
           {/* ── Logo ── */}
           <Link to="/" className="shrink-0 flex items-center" aria-label="Memory3D Home">
-            <img src={logo} alt="Memory3D" className="h-8 md:h-9 w-auto" />
+            <img src={logo} alt="Memory3D" className="h-8 md:h-9 w-auto brightness-0 invert" />
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 xl:gap-7">
+          <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 xl:gap-5">
             {nav.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
-                className="nav-link text-[10px] xl:text-[11px] tracking-[0.18em] text-foreground/50 hover:text-foreground transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
+                className="nav-link text-[9px] xl:text-[9.5px] tracking-[0.15em] text-white/45 hover:text-white transition-colors duration-200 uppercase font-semibold whitespace-nowrap"
                 activeProps={{ className: "nav-link nav-link-active !text-gold" }}
               >
                 {n.label}
@@ -129,7 +99,7 @@ export function Header() {
             {/* Hamburger */}
             <button
               onClick={() => setOpen((v) => !v)}
-              className="lg:hidden relative flex items-center justify-center w-9 h-9 rounded-full text-foreground/60 hover:text-gold hover:bg-gold/10 transition-all duration-200"
+              className="lg:hidden relative flex items-center justify-center w-9 h-9 rounded-full text-white/50 hover:text-gold hover:bg-gold/10 transition-all duration-200"
               aria-label="Toggle navigation"
               aria-expanded={open}
             >
@@ -163,8 +133,8 @@ export function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 bg-white flex flex-col"
-            style={{ paddingTop: bannerVisible ? "calc(34px + 68px)" : "68px" }}
+            className="fixed inset-0 z-40 bg-[#0a0a0a] flex flex-col"
+            style={{ paddingTop: "68px" }}
           >
             <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-gold" />
 
@@ -189,10 +159,10 @@ export function Header() {
                     <Link
                       to={n.to}
                       onClick={() => setOpen(false)}
-                      className="group flex items-center justify-between py-4 border-b border-border/60"
+                      className="group flex items-center justify-between py-4 border-b border-white/[0.08]"
                       activeProps={{}}
                     >
-                      <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-foreground group-hover:text-gold transition-colors duration-200 leading-tight">
+                      <span className="font-display text-[clamp(1.6rem,6vw,2.6rem)] text-white/75 group-hover:text-gold transition-colors duration-200 leading-tight">
                         {n.label}
                       </span>
                       <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 text-gold transition-all duration-200 group-hover:translate-x-1" />
@@ -224,7 +194,7 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.42 }}
-              className="px-8 py-6 border-t border-border/50 flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase text-muted-foreground"
+              className="px-8 py-6 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-4 text-[10px] tracking-[0.18em] uppercase text-white/30"
             >
               <a
                 href="tel:888-936-3667"
