@@ -4,27 +4,19 @@ import { Upload, X } from "lucide-react";
 interface PhotoUploadProps {
   shapePreviewImage: string;
   onPhotoChange: (file: File | null) => void;
+  externalPreview?: string | null;
 }
 
-export function PhotoUpload({ shapePreviewImage, onPhotoChange }: PhotoUploadProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+export function PhotoUpload({ shapePreviewImage, onPhotoChange, externalPreview }: PhotoUploadProps) {
+  const [internalPreview, setPreview] = useState<string | null>(null);
+  const preview = externalPreview !== undefined ? externalPreview : internalPreview;
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Cleanup object URL on unmount or when preview changes
-  useEffect(() => {
-    return () => {
-      if (preview && preview.startsWith("blob:")) {
-        URL.revokeObjectURL(preview);
-      }
-    };
-  }, [preview]);
-
   const handleFile = (file: File) => {
     if (file && file.type.startsWith("image/")) {
-      // Revoke old preview if it exists
-      if (preview && preview.startsWith("blob:")) {
-        URL.revokeObjectURL(preview);
+      if (internalPreview && internalPreview.startsWith("blob:")) {
+        URL.revokeObjectURL(internalPreview);
       }
       const url = URL.createObjectURL(file);
       setPreview(url);
@@ -45,6 +37,15 @@ export function PhotoUpload({ shapePreviewImage, onPhotoChange }: PhotoUploadPro
     onPhotoChange(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  // Cleanup only internal blob URLs
+  useEffect(() => {
+    return () => {
+      if (internalPreview && internalPreview.startsWith("blob:")) {
+        URL.revokeObjectURL(internalPreview);
+      }
+    };
+  }, [internalPreview]);
 
   return (
     <div className="mt-8">

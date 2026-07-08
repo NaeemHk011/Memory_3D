@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { Reveal } from "@/components/site/Reveal";
-import { ChevronDown, ChevronUp, ArrowRight, Upload, RotateCcw, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowRight, Upload, RotateCcw, Loader2, CheckCircle, AlertCircle, Pencil } from "lucide-react";
+import { ImageEditor } from "@/components/shop/ImageEditor";
 import bannerAcrylic from "@/assets/banner-acrylic.png";
 import imgGlossy from "@/assets/acrylic-glossy.png";
 import imgHang from "@/assets/acrylic-hang.png";
@@ -111,6 +112,7 @@ function AcrylicConfigurator() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [rotated, setRotated] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -131,11 +133,21 @@ function AcrylicConfigurator() {
       reader.onerror = reject;
     });
 
+  const handleEditorSave = (editedBase64: string) => {
+    setPreviewUrl(editedBase64);
+    setShowEditor(false);
+  };
+
   const handleOrder = async () => {
     setStatus("loading");
     setErrorMsg("");
     try {
-      const photoBase64 = uploadedFile ? await toBase64(uploadedFile) : null;
+      // If user edited the image, previewUrl is already a base64 string
+      const photoBase64 = previewUrl?.startsWith("data:")
+        ? previewUrl
+        : uploadedFile
+        ? await toBase64(uploadedFile)
+        : null;
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -224,17 +236,34 @@ function AcrylicConfigurator() {
             )}
           </div>
           {previewUrl && (
-            <button
-              onClick={() => { setPreviewUrl(null); setUploadedFile(null); if (fileRef.current) fileRef.current.value = ""; }}
-              className="text-[10px] tracking-wider uppercase text-muted-foreground hover:text-gold transition-colors"
-            >
-              Remove photo
-            </button>
+            <div className="flex items-center gap-5">
+              <button
+                onClick={() => setShowEditor(true)}
+                className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-gold text-black text-[10px] tracking-[0.2em] uppercase font-bold rounded-sm shadow-gold hover:opacity-90 transition"
+              >
+                <Pencil className="w-3.5 h-3.5" /> Edit Image
+              </button>
+              <button
+                onClick={() => { setPreviewUrl(null); setUploadedFile(null); if (fileRef.current) fileRef.current.value = ""; }}
+                className="text-[10px] tracking-wider uppercase text-muted-foreground hover:text-gold transition-colors"
+              >
+                Remove
+              </button>
+            </div>
           )}
         </div>
       </div>
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+
+      {/* ── Image Editor Modal ── */}
+      {showEditor && previewUrl && (
+        <ImageEditor
+          imageUrl={previewUrl}
+          onClose={() => setShowEditor(false)}
+          onSave={handleEditorSave}
+        />
+      )}
 
       {/* ── Right: Size + Customer Form ── */}
       <div className="space-y-6">

@@ -17,7 +17,14 @@
       "Bash(netstat -ano)",
       "Bash(findstr :3001)",
       "PowerShell(netstat *)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Read(//c/Users/Administrator/Downloads/**)",
+      "Bash(npm install *)",
+      "Bash(node -e \"require\\('fabric'\\); console.log\\('fabric ok:', require\\('fabric/package.json'\\).version\\)\")",
+      "Bash(node -e \"require\\('react-cropper'\\); console.log\\('react-cropper ok'\\)\")",
+      "Bash(node *)",
+      "Bash(npx kill-port *)",
+      "Bash(pkill -f \"vite dev\")"
     ]
   }
 }
