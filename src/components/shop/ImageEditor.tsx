@@ -120,20 +120,20 @@ function filtersToCss(f: Filters): string {
 /* ─── Apply filters to Fabric.js image ───────────────────── */
 function applyFabricFilters(img: fabric.Image, f: Filters) {
   (img as any).filters = [];
-  const push = (filter: any) => (img as any).filters.push(filter);
+  const add = (filter: any) => (img as any).filters.push(filter);
   const F = fabric.Image.filters as any;
 
-  if (f.brightness !== 0) push(new F.Brightness({ brightness: f.brightness / 100 }));
-  if (f.contrast   !== 0) push(new F.Contrast  ({ contrast:   f.contrast / 100 }));
-  if (f.saturation !== 0) push(new F.Saturation ({ saturation: f.saturation / 100 }));
-  if (f.vibrance   !== 0) push(new F.Vibrance   ({ vibrance:   f.vibrance / 100 }));
-  if (f.warmth     !== 0) push(new F.HueRotation({ rotation:   f.warmth / 500 }));
-  if (f.blur        > 0)  push(new F.Blur        ({ blur:       f.blur / 100 }));
-  if (f.noise       > 0)  push(new F.Noise       ({ noise:      f.noise }));
-  if (f.grayscale)         push(new F.Grayscale());
-  if (f.sepia)             push(new F.Sepia());
-  if (f.invert)            push(new F.Invert());
-  if (f.sharpen)           push(new F.Convolute ({ matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0] }));
+  if (f.brightness !== 0) add(new F.Brightness({ brightness: f.brightness / 100 }));
+  if (f.contrast   !== 0) add(new F.Contrast  ({ contrast:   f.contrast / 100 }));
+  if (f.saturation !== 0) add(new F.Saturation ({ saturation: f.saturation / 100 }));
+  if (f.vibrance   !== 0 && F.Vibrance) add(new F.Vibrance({ vibrance: f.vibrance / 100 }));
+  if (f.warmth     !== 0) add(new F.HueRotation({ rotation:  f.warmth / 500 }));
+  if (f.blur        > 0)  add(new F.Blur        ({ blur:      f.blur / 100 }));
+  if (f.noise       > 0)  add(new F.Noise       ({ noise:     f.noise }));
+  if (f.grayscale)         add(new F.Grayscale());
+  if (f.sepia)             add(new F.Sepia());
+  if (f.invert)            add(new F.Invert());
+  if (f.sharpen)           add(new F.Convolute({ matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0] }));
 
   img.applyFilters();
 }
@@ -211,11 +211,12 @@ type Tab = "adjust" | "filters" | "crop" | "text";
 
 /* ════════════════════════ MAIN COMPONENT ═══════════════════ */
 export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasElRef  = useRef<HTMLCanvasElement>(null);
-  const fabricRef    = useRef<fabric.Canvas | null>(null);
-  const fabricImgRef = useRef<fabric.Image | null>(null);
-  const cropperRef   = useRef<any>(null);
+  const containerRef     = useRef<HTMLDivElement>(null);
+  const canvasElRef      = useRef<HTMLCanvasElement>(null);
+  const fabricRef        = useRef<fabric.Canvas | null>(null);
+  const fabricImgRef     = useRef<fabric.Image | null>(null);
+  const cropperRef       = useRef<any>(null);
+  const lastTouchDistRef = useRef<number | null>(null);
 
   const [ready,     setReady]     = useState(false);
   const [tab,       setTab]       = useState<Tab>("adjust");
@@ -223,10 +224,9 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
   const [cropRatio, setCropRatio] = useState<number | undefined>(undefined);
   const [currentSrc, setCurrentSrc] = useState(imageUrl);
 
-  /* History */
-  const [history, setHistory] = useState<EditorState[]>([INIT]);
-  const [histIdx, setHistIdx] = useState(0);
-  const state = history[histIdx];
+  /* History — single atomic state eliminates index/array race condition */
+  const [hist, setHist] = useState({ entries: [INIT] as EditorState[], idx: 0 });
+  const state = hist.entries[hist.idx];
 
   /* Text */
   const [textInput,      setTextInput]      = useState("Your text");
@@ -277,12 +277,19 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
 
   /* ── History helpers ── */
   const push = useCallback((next: EditorState) => {
-    setHistory(h => [...h.slice(0, histIdx + 1), next]);
-    setHistIdx(i => i + 1);
-  }, [histIdx]);
+    setHist(prev => ({
+      entries: [...prev.entries.slice(0, prev.idx + 1), next],
+      idx: prev.idx + 1,
+    }));
+  }, []); // empty deps — always uses latest prev via functional update
 
-  const undo = () => histIdx > 0 && setHistIdx(i => i - 1);
-  const redo = () => histIdx < history.length - 1 && setHistIdx(i => i + 1);
+  const undo = useCallback(() => {
+    setHist(prev => prev.idx > 0 ? { ...prev, idx: prev.idx - 1 } : prev);
+  }, []);
+
+  const redo = useCallback(() => {
+    setHist(prev => prev.idx < prev.entries.length - 1 ? { ...prev, idx: prev.idx + 1 } : prev);
+  }, []);
 
   /* ── Init Fabric canvas ── */
   useEffect(() => {
@@ -292,6 +299,11 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
     const container = containerRef.current;
     const el        = canvasElRef.current;
     if (!container || !el) return;
+
+    // Use Canvas2D filter backend — avoids WebGL shader compilation lag/crash on first load
+    if (!(fabric as any).filterBackend) {
+      (fabric as any).filterBackend = new (fabric as any).Canvas2dFilterBackend();
+    }
 
     if (fabricRef.current) {
       try { fabricRef.current.dispose(); } catch {}
@@ -374,12 +386,19 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSrc]);
 
-  /* Sync filters */
+  /* Sync filters — debounced so rapid slider drags don't block the main thread */
   useEffect(() => {
     const img = fabricImgRef.current;
     if (!img || !ready) return;
-    applyFabricFilters(img, state.filters);
-    fabricRef.current?.renderAll();
+
+    const tid = window.setTimeout(() => {
+      try {
+        applyFabricFilters(img, state.filters);
+        fabricRef.current?.renderAll();
+      } catch { /* silent */ }
+    }, 80);
+
+    return () => window.clearTimeout(tid);
   }, [state.filters, ready]);
 
   /* Sync transform */
@@ -389,6 +408,49 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
     img.set({ angle: state.rotation, flipX: state.flipH, flipY: state.flipV });
     fabricRef.current?.renderAll();
   }, [state.rotation, state.flipH, state.flipV, ready]);
+
+  /* ── Keyboard shortcuts: Ctrl+Z undo, Ctrl+Y / Ctrl+Shift+Z redo ── */
+  /* undo/redo are stable useCallback refs so this effect runs once on mount. */
+  useEffect(() => {
+    const onShortcut = (e: KeyboardEvent) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
+        if (e.key === "y" || (e.key === "z" && e.shiftKey)) { e.preventDefault(); redo(); }
+      }
+    };
+    window.addEventListener("keydown", onShortcut);
+    return () => window.removeEventListener("keydown", onShortcut);
+  }, [undo, redo]);
+
+  /* ── Touch: pinch-to-zoom on canvas ── */
+  const getTouchDist = (t: React.TouchList) => {
+    const dx = t[0].clientX - t[1].clientX;
+    const dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) lastTouchDistRef.current = getTouchDist(e.touches);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length !== 2 || lastTouchDistRef.current === null) return;
+    e.preventDefault();
+    const dist = getTouchDist(e.touches);
+    const c = fabricRef.current;
+    if (c) {
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const newZoom = Math.max(0.3, Math.min(5, c.getZoom() * (dist / lastTouchDistRef.current)));
+      c.zoomToPoint({ x: midX - rect.left, y: midY - rect.top } as fabric.Point, newZoom);
+    }
+    lastTouchDistRef.current = dist;
+  };
+
+  const onTouchEnd = () => { lastTouchDistRef.current = null; };
 
   /* ── Handlers ── */
   const setFilter = (key: keyof Filters, val: number | boolean) =>
@@ -487,8 +549,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
       .getCroppedCanvas({ maxWidth: 4096, maxHeight: 4096 })
       .toDataURL("image/jpeg", 0.92);
     setCurrentSrc(dataUrl);
-    setHistory([INIT]);
-    setHistIdx(0);
+    setHist({ entries: [INIT], idx: 0 });
     setCropMode(false);
     setTab("adjust");
   };
@@ -567,14 +628,14 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
         <div className="flex items-center gap-2">
           {/* Undo / Redo */}
           <button
-            onClick={undo} disabled={histIdx === 0}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-sm border text-[10px] transition-all cursor-pointer select-none ${histIdx === 0 ? "opacity-25 pointer-events-none border-white/5 text-white/30" : "border-white/10 text-white/50 hover:border-white/20 hover:text-white"}`}
+            onClick={undo} disabled={hist.idx === 0}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-sm border text-[10px] transition-all cursor-pointer select-none ${hist.idx === 0 ? "opacity-25 pointer-events-none border-white/5 text-white/30" : "border-white/10 text-white/50 hover:border-white/20 hover:text-white"}`}
           >
             <Undo2 className="w-3.5 h-3.5" /> Undo
           </button>
           <button
-            onClick={redo} disabled={histIdx >= history.length - 1}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-sm border text-[10px] transition-all cursor-pointer select-none ${histIdx >= history.length - 1 ? "opacity-25 pointer-events-none border-white/5 text-white/30" : "border-white/10 text-white/50 hover:border-white/20 hover:text-white"}`}
+            onClick={redo} disabled={hist.idx >= hist.entries.length - 1}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-sm border text-[10px] transition-all cursor-pointer select-none ${hist.idx >= hist.entries.length - 1 ? "opacity-25 pointer-events-none border-white/5 text-white/30" : "border-white/10 text-white/50 hover:border-white/20 hover:text-white"}`}
           >
             <Redo2 className="w-3.5 h-3.5" /> Redo
           </button>
@@ -1016,7 +1077,10 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
         <div
           ref={containerRef}
           className="flex-1 relative overflow-hidden flex items-center justify-center"
-          style={{ background: "#141414" }}
+          style={{ background: "#141414", touchAction: "none" }}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           {!ready && !cropMode && (
             <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#141414]">

@@ -7,21 +7,31 @@ interface PhotoUploadProps {
   externalPreview?: string | null;
 }
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
 export function PhotoUpload({ shapePreviewImage, onPhotoChange, externalPreview }: PhotoUploadProps) {
   const [internalPreview, setPreview] = useState<string | null>(null);
   const preview = externalPreview !== undefined ? externalPreview : internalPreview;
   const [isDragging, setIsDragging] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
-    if (file && file.type.startsWith("image/")) {
-      if (internalPreview && internalPreview.startsWith("blob:")) {
-        URL.revokeObjectURL(internalPreview);
-      }
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      onPhotoChange(file);
+    if (!file.type.startsWith("image/")) {
+      setFileError("Only image files (JPG, PNG, WEBP) are supported.");
+      return;
     }
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max size is 10 MB.`);
+      return;
+    }
+    setFileError(null);
+    if (internalPreview && internalPreview.startsWith("blob:")) {
+      URL.revokeObjectURL(internalPreview);
+    }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    onPhotoChange(file);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -34,6 +44,7 @@ export function PhotoUpload({ shapePreviewImage, onPhotoChange, externalPreview 
   const handleReset = (e: React.MouseEvent) => {
     e.stopPropagation();
     setPreview(null);
+    setFileError(null);
     onPhotoChange(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -101,6 +112,10 @@ export function PhotoUpload({ shapePreviewImage, onPhotoChange, externalPreview 
           {preview ? "Clear & Start Over" : "Start Over"}
         </button>
       </div>
+
+      {fileError && (
+        <p className="mt-2 text-xs text-red-500 font-medium">{fileError}</p>
+      )}
     </div>
   );
 }
