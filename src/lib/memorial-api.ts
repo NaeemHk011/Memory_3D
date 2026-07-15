@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import type { Memorial, MemorialMedia, MemorialStory, MemorialDate, MemorialMember } from "@/types/memorial";
 
 function slugify(name: string): string {
@@ -24,13 +24,14 @@ export async function createMemorial(data: {
   cover_photo?: string;
   is_private?: boolean;
 }): Promise<Memorial> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const sb = getSupabase();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
   const baseSlug = slugify(data.name);
   const slug = `${baseSlug}-${Date.now().toString(36)}`;
 
-  const { data: memorial, error } = await supabase
+  const { data: memorial, error } = await sb
     .from("memorials")
     .insert({
       ...data,
@@ -46,7 +47,7 @@ export async function createMemorial(data: {
 }
 
 export async function getMemorialBySlug(slug: string): Promise<Memorial | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("memorials")
     .select("*")
     .eq("slug", slug)
@@ -57,10 +58,11 @@ export async function getMemorialBySlug(slug: string): Promise<Memorial | null> 
 }
 
 export async function getMyMemorials(): Promise<Memorial[]> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const sb = getSupabase();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return [];
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("memorials")
     .select("*")
     .eq("owner_id", user.id)
@@ -71,7 +73,7 @@ export async function getMyMemorials(): Promise<Memorial[]> {
 }
 
 export async function updateMemorial(id: string, updates: Partial<Memorial>): Promise<Memorial> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("memorials")
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq("id", id)
@@ -83,7 +85,7 @@ export async function updateMemorial(id: string, updates: Partial<Memorial>): Pr
 }
 
 export async function deleteMemorial(id: string): Promise<void> {
-  const { error } = await supabase.from("memorials").delete().eq("id", id);
+  const { error } = await getSupabase().from("memorials").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -94,23 +96,24 @@ export async function uploadPhoto(
   file: File,
   caption?: string
 ): Promise<MemorialMedia> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const sb = getSupabase();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
   const ext = file.name.split(".").pop();
   const path = `${memorialId}/${crypto.randomUUID()}.${ext}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await sb.storage
     .from("memorial-photos")
     .upload(path, file, { cacheControl: "3600", upsert: false });
 
   if (uploadError) throw uploadError;
 
-  const { data: { publicUrl } } = supabase.storage
+  const { data: { publicUrl } } = sb.storage
     .from("memorial-photos")
     .getPublicUrl(path);
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("memorial_media")
     .insert({
       memorial_id: memorialId,
@@ -127,7 +130,7 @@ export async function uploadPhoto(
 }
 
 export async function getMemorialMedia(memorialId: string): Promise<MemorialMedia[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("memorial_media")
     .select("*")
     .eq("memorial_id", memorialId)
@@ -138,7 +141,7 @@ export async function getMemorialMedia(memorialId: string): Promise<MemorialMedi
 }
 
 export async function deleteMedia(id: string): Promise<void> {
-  const { error } = await supabase.from("memorial_media").delete().eq("id", id);
+  const { error } = await getSupabase().from("memorial_media").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -150,9 +153,10 @@ export async function submitStory(data: {
   title: string;
   content: string;
 }): Promise<MemorialStory> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const sb = getSupabase();
+  const { data: { user } } = await sb.auth.getUser();
 
-  const { data: story, error } = await supabase
+  const { data: story, error } = await sb
     .from("memorial_stories")
     .insert({
       ...data,
@@ -167,7 +171,7 @@ export async function submitStory(data: {
 }
 
 export async function getStories(memorialId: string): Promise<MemorialStory[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("memorial_stories")
     .select("*")
     .eq("memorial_id", memorialId)
@@ -181,7 +185,7 @@ export async function getStories(memorialId: string): Promise<MemorialStory[]> {
 // ── Dates ──────────────────────────────────────────────────
 
 export async function getMemorialDates(memorialId: string): Promise<MemorialDate[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("memorial_dates")
     .select("*")
     .eq("memorial_id", memorialId)
@@ -197,7 +201,7 @@ export async function addMemorialDate(data: {
   date: string;
   note?: string;
 }): Promise<MemorialDate> {
-  const { data: d, error } = await supabase
+  const { data: d, error } = await getSupabase()
     .from("memorial_dates")
     .insert(data)
     .select()
@@ -214,14 +218,14 @@ export async function inviteFamilyMember(
   email: string,
   role: "editor" | "viewer" = "viewer"
 ): Promise<void> {
-  const { error } = await supabase.functions.invoke("invite-family", {
+  const { error } = await getSupabase().functions.invoke("invite-family", {
     body: { memorial_id: memorialId, email, role },
   });
   if (error) throw error;
 }
 
 export async function getMemorialMembers(memorialId: string): Promise<MemorialMember[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("memorial_members")
     .select("*")
     .eq("memorial_id", memorialId);

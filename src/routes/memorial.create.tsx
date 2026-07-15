@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { createMemorial } from "@/lib/memorial-api";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { Loader2, Upload, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/memorial/create")({
@@ -50,13 +50,13 @@ function CreateMemorialPage() {
       if (coverFile) {
         const ext = coverFile.name.split(".").pop();
         const path = `covers/${crypto.randomUUID()}.${ext}`;
-        const { error: uploadErr } = await supabase.storage
+        const { error: uploadErr } = await getSupabase().storage
           .from("memorial-covers")
           .upload(path, coverFile, { cacheControl: "3600" });
 
         if (uploadErr) throw uploadErr;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = getSupabase().storage
           .from("memorial-covers")
           .getPublicUrl(path);
         coverUrl = publicUrl;

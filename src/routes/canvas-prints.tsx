@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { Reveal } from "@/components/site/Reveal";
-import { ChevronDown, ChevronUp, ArrowRight, Upload, RotateCcw, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { ImageEditor } from "@/components/shop/ImageEditor";
+import { ChevronDown, ChevronUp, ArrowRight, Upload, RotateCcw, Pencil, Loader2, CheckCircle, AlertCircle, ShoppingCart, X } from "lucide-react";
 import imgFlexibility from "@/assets/canvas-flexibility.png";
 import imgFrames from "@/assets/canvas-frames.png";
 import imgHang from "@/assets/canvas-hang.png";
@@ -30,6 +31,12 @@ const sizes = [
   { size: '18" × 24"', label: "18x24", off: "87% OFF", original: "$185.97", price: "$24.16", badge: null, aspect: "aspect-[3/4]" },
   { size: '24" × 36"', label: "24x36", off: "87% OFF", original: "$260.41", price: "$33.83", badge: null, aspect: "aspect-[2/3]" },
   { size: '30" × 40"', label: "30x40", off: "87% OFF", original: "$348.70", price: "$45.30", badge: null, aspect: "aspect-[3/4]" },
+];
+
+const hangers = [
+  { id: "none",    label: "No Hanger Set",     desc: "Canvas only — no hardware",          price: 0    },
+  { id: "std",     label: "Standard Hanger",   desc: "Sawtooth + D-rings, ready to hang",  price: 4.99 },
+  { id: "deluxe",  label: "Deluxe Wall Mount",  desc: "Premium floating mount system",      price: 9.99 },
 ];
 
 const featureCards = [
@@ -130,14 +137,20 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 function CanvasConfigurator() {
-  const [selectedSize, setSelectedSize] = useState(sizes[3]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [rotated, setRotated] = useState(false);
+  const [selectedSize,   setSelectedSize]   = useState(sizes[3]);
+  const [selectedHanger, setSelectedHanger] = useState("none");
+  const [previewUrl,     setPreviewUrl]     = useState<string | null>(null);
+  const [uploadedFile,   setUploadedFile]   = useState<File | null>(null);
+  const [rotated,        setRotated]        = useState(false);
+  const [showEditor,     setShowEditor]     = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status,   setStatus]   = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const basePrice   = parseFloat(selectedSize.price.replace("$", ""));
+  const hangerPrice = hangers.find((h) => h.id === selectedHanger)?.price ?? 0;
+  const totalPrice  = (basePrice + hangerPrice).toFixed(2);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -150,7 +163,7 @@ function CanvasConfigurator() {
     new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
+      reader.onload  = () => resolve(reader.result as string);
       reader.onerror = reject;
     });
 
@@ -158,16 +171,20 @@ function CanvasConfigurator() {
     setStatus("loading");
     setErrorMsg("");
     try {
-      const photoBase64 = uploadedFile ? await toBase64(uploadedFile) : null;
+      const photoBase64 = previewUrl?.startsWith("data:")
+        ? previewUrl
+        : uploadedFile ? await toBase64(uploadedFile) : null;
+      const hanger = hangers.find((h) => h.id === selectedHanger);
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          cartItems: [{ shapeLabel: "Canvas Print", sizeLabel: selectedSize.size, price: parseFloat(selectedSize.price.replace("$", "")) }],
-          totalPrice: parseFloat(selectedSize.price.replace("$", "")),
+          name: form.name, email: form.email, phone: form.phone,
+          cartItems: [
+            { shapeLabel: "Canvas Print", sizeLabel: selectedSize.size, price: basePrice },
+            ...(hanger && hanger.price > 0 ? [{ shapeLabel: hanger.label, sizeLabel: "", price: hanger.price }] : []),
+          ],
+          totalPrice: parseFloat(totalPrice),
           photoBase64,
           photoName: uploadedFile?.name || null,
         }),
@@ -179,6 +196,26 @@ function CanvasConfigurator() {
       setErrorMsg(err.message || "Something went wrong. Please try again.");
       setStatus("error");
     }
+  };
+
+  const resetPhoto = () => {
+    setPreviewUrl(null);
+    setUploadedFile(null);
+    setRotated(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  // Derive rotated aspect class
+  const getAspect = () => {
+    if (!rotated) return selectedSize.aspect;
+    const map: Record<string, string> = {
+      "aspect-square":  "aspect-square",
+      "aspect-[11/14]": "aspect-[14/11]",
+      "aspect-[4/5]":   "aspect-[5/4]",
+      "aspect-[3/4]":   "aspect-[4/3]",
+      "aspect-[2/3]":   "aspect-[3/2]",
+    };
+    return map[selectedSize.aspect] ?? selectedSize.aspect;
   };
 
   if (status === "success") {
@@ -199,138 +236,231 @@ function CanvasConfigurator() {
     );
   }
 
-  const canSubmit = form.name && form.email && form.phone && uploadedFile;
+  const canSubmit = !!(form.name && form.email && form.phone && previewUrl);
 
   return (
-    <div className="grid lg:grid-cols-2 gap-10 items-start">
+    <div className="grid lg:grid-cols-[1fr_400px] gap-10 items-start">
 
-      {/* ── Left: Preview ── */}
-      <div className="flex gap-4">
-        <div className="flex flex-col gap-3 pt-2">
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="flex flex-col items-center gap-1.5 w-16 py-3 bg-card border border-border rounded-sm hover:border-gold/50 hover:bg-gold/5 transition-all group"
-          >
-            <Upload className="w-5 h-5 text-gold" />
-            <span className="text-[9px] tracking-[0.15em] uppercase font-bold text-muted-foreground group-hover:text-gold transition-colors">
-              Upload
-            </span>
-          </button>
-          <button
-            onClick={() => setRotated((v) => !v)}
-            className="flex flex-col items-center gap-1.5 w-16 py-3 bg-card border border-border rounded-sm hover:border-gold/50 hover:bg-gold/5 transition-all group"
-          >
-            <RotateCcw className="w-5 h-5 text-gold" />
-            <span className="text-[9px] tracking-[0.12em] uppercase font-bold text-muted-foreground group-hover:text-gold transition-colors leading-tight text-center">
-              Rotate
-            </span>
-          </button>
+      {/* ══ LEFT: Config ══ */}
+      <div className="space-y-8">
+
+        {/* Step 1 — Format */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-6 h-6 rounded-full bg-gold text-black text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
+            <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-foreground">Choose Format</p>
+          </div>
+
+          {/* Table header */}
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-4 px-4 pb-2 text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-bold border-b border-border">
+            <span>Format</span>
+            <span className="text-right">Original</span>
+            <span className="text-right">Price</span>
+            <span className="text-right">Saving</span>
+          </div>
+
+          <div className="divide-y divide-border">
+            {sizes.map((s) => {
+              const active = selectedSize.label === s.label;
+              return (
+                <button
+                  key={s.label}
+                  onClick={() => setSelectedSize(s)}
+                  className={`w-full grid grid-cols-[1fr_auto_auto_auto] gap-x-4 items-center px-4 py-3.5 transition-all text-left ${
+                    active ? "bg-gold/8 border-l-2 border-l-gold" : "hover:bg-card/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${active ? "border-gold" : "border-border"}`}>
+                      {active && <span className="w-2 h-2 rounded-full bg-gold block" />}
+                    </span>
+                    <span className="text-sm font-semibold text-foreground">{s.size}</span>
+                    {s.badge && (
+                      <span className="text-[9px] tracking-[0.1em] uppercase font-bold px-2 py-0.5 bg-gold text-black rounded-full">
+                        {s.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-muted-foreground line-through text-right">{s.original}</span>
+                  <span className="text-sm font-bold text-gold text-right">{s.price}</span>
+                  <span className="text-[9px] font-bold text-gold/80 text-right">{s.off}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center gap-4">
-          <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-gold">
-            {selectedSize.label}
-          </p>
-          <div
-            className={`w-full max-w-[340px] ${rotated ? (selectedSize.aspect === "aspect-square" ? "aspect-square" : selectedSize.aspect === "aspect-[11/14]" ? "aspect-[14/11]" : selectedSize.aspect === "aspect-[4/5]" ? "aspect-[5/4]" : selectedSize.aspect === "aspect-[3/4]" ? "aspect-[4/3]" : selectedSize.aspect === "aspect-[2/3]" ? "aspect-[3/2]" : selectedSize.aspect) : selectedSize.aspect} bg-muted/40 border-2 border-dashed border-border rounded-sm overflow-hidden flex items-center justify-center relative transition-all duration-300`}
-          >
-            {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className={`w-full h-full object-contain transition-transform duration-300 ${rotated ? "rotate-90" : ""}`} />
-            ) : (
-              <button
-                onClick={() => fileRef.current?.click()}
-                className="flex flex-col items-center gap-3 text-muted-foreground hover:text-gold transition-colors p-8"
-              >
-                <Upload className="w-8 h-8" />
-                <span className="text-[11px] tracking-[0.2em] uppercase font-semibold">Upload Image</span>
-              </button>
-            )}
+        {/* Step 2 — Hanger */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-6 h-6 rounded-full bg-gold text-black text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
+            <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-foreground">Choose Hanger Set</p>
           </div>
-          {previewUrl && (
-            <button
-              onClick={() => { setPreviewUrl(null); setUploadedFile(null); if (fileRef.current) fileRef.current.value = ""; }}
-              className="text-[10px] tracking-wider uppercase text-muted-foreground hover:text-gold transition-colors"
-            >
-              Remove photo
-            </button>
-          )}
+          <div className="grid sm:grid-cols-3 gap-3">
+            {hangers.map((h) => {
+              const active = selectedHanger === h.id;
+              return (
+                <button
+                  key={h.id}
+                  onClick={() => setSelectedHanger(h.id)}
+                  className={`flex flex-col items-start p-4 rounded-sm border transition-all text-left ${
+                    active
+                      ? "border-gold bg-gold/8 shadow-[0_0_0_1px_oklch(0.62_0.14_79/0.3)]"
+                      : "border-border bg-card hover:border-gold/40"
+                  }`}
+                >
+                  {/* Mini icon block */}
+                  <div className={`w-10 h-10 rounded mb-3 flex items-center justify-center text-lg ${active ? "bg-gold/20" : "bg-muted/60"}`}>
+                    {h.id === "none" ? "🚫" : h.id === "std" ? "🔩" : "🖼️"}
+                  </div>
+                  <p className={`text-[11px] font-bold tracking-wide mb-1 ${active ? "text-gold" : "text-foreground"}`}>{h.label}</p>
+                  <p className="text-[10px] text-muted-foreground leading-snug mb-2">{h.desc}</p>
+                  <p className={`text-[11px] font-bold ${active ? "text-gold" : "text-muted-foreground"}`}>
+                    {h.price === 0 ? "Free" : `+$${h.price.toFixed(2)}`}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Step 3 — Summary */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-6 h-6 rounded-full bg-gold text-black text-[11px] font-bold flex items-center justify-center shrink-0">3</span>
+            <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-foreground">Summary</p>
+          </div>
+          <div className="bg-card border border-border rounded-sm divide-y divide-border">
+            <div className="flex justify-between items-center px-5 py-3">
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Product</span>
+              <span className="text-sm font-semibold text-foreground">Canvas Print</span>
+            </div>
+            <div className="flex justify-between items-center px-5 py-3">
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Format</span>
+              <span className="text-sm font-semibold text-foreground">{selectedSize.size}</span>
+            </div>
+            <div className="flex justify-between items-center px-5 py-3">
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Hanger</span>
+              <span className="text-sm font-semibold text-foreground">{hangers.find((h) => h.id === selectedHanger)?.label}</span>
+            </div>
+            <div className="flex justify-between items-center px-5 py-4">
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-bold">Price</span>
+              <span className="font-display text-2xl text-gold font-bold">${totalPrice}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      {/* ══ RIGHT: Preview + Edit + Form + Order ══ */}
+      <div className="space-y-5 lg:sticky lg:top-28">
 
-      {/* ── Right: Size + Customer Form ── */}
-      <div className="space-y-6">
-        {/* Size selector */}
-        <div>
-          <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-foreground mb-3">
-            Select Size
-          </p>
-          <div className="space-y-2">
-            {sizes.map((s) => (
-              <button
-                key={s.label}
-                onClick={() => setSelectedSize(s)}
-                className={`w-full flex items-center justify-between px-5 py-4 rounded-sm border transition-all duration-200 ${
-                  selectedSize.label === s.label
-                    ? "border-gold bg-gold/5 shadow-[0_0_0_1px_oklch(0.62_0.14_79/0.3)]"
-                    : "border-border bg-card hover:border-gold/40 hover:bg-gold/5"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-foreground">{s.size}</span>
-                  {s.badge && (
-                    <span className="text-[9px] tracking-[0.15em] uppercase font-bold px-2 py-0.5 bg-gold text-black rounded-full">
-                      {s.badge}
-                    </span>
-                  )}
+        {/* Image preview */}
+        <div className="bg-card border border-border rounded-sm overflow-hidden">
+          <div
+            className={`w-full ${getAspect()} relative overflow-hidden cursor-pointer transition-all duration-300`}
+            onClick={() => !previewUrl && fileRef.current?.click()}
+          >
+            {previewUrl ? (
+              <>
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className={`w-full h-full object-cover transition-transform duration-300 ${rotated ? "rotate-90 scale-[0.75]" : ""}`}
+                />
+                {/* shimmer overlay */}
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 50%)" }} />
+              </>
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:text-gold transition-colors p-8">
+                <div className="w-16 h-16 rounded-full bg-muted/40 flex items-center justify-center">
+                  <Upload className="w-7 h-7" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-muted-foreground line-through">{s.original}</span>
-                  <span className="text-sm font-bold text-gold">{s.price}</span>
-                  <span className="text-[9px] tracking-[0.1em] uppercase font-bold px-2 py-0.5 bg-gold/10 text-gold rounded-full border border-gold/20">
-                    {s.off}
-                  </span>
-                </div>
-              </button>
-            ))}
+                <p className="text-[11px] tracking-[0.2em] uppercase font-semibold text-center">
+                  Click to upload your photo
+                </p>
+                <p className="text-[10px] text-muted-foreground text-center">
+                  JPG, PNG or WEBP · Max 10 MB
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Toolbar */}
+          <div className="flex items-center gap-1 p-2 border-t border-border bg-background/50">
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex items-center gap-1.5 px-3 py-2 rounded text-[10px] tracking-wide uppercase font-bold text-muted-foreground hover:text-gold hover:bg-gold/5 transition-all"
+            >
+              <Upload className="w-3.5 h-3.5" /> Upload
+            </button>
+            <button
+              onClick={() => setRotated((v) => !v)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded text-[10px] tracking-wide uppercase font-bold text-muted-foreground hover:text-gold hover:bg-gold/5 transition-all"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> Rotate
+            </button>
+            {previewUrl && (
+              <>
+                <button
+                  onClick={() => setShowEditor(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded text-[10px] tracking-wide uppercase font-bold text-gold border border-gold/30 hover:bg-gold/10 transition-all"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> Edit Photo
+                </button>
+                <button
+                  onClick={resetPhoto}
+                  className="ml-auto flex items-center gap-1 px-2 py-2 rounded text-[10px] text-muted-foreground hover:text-red-400 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Customer details */}
-        <div className="bg-card border border-border rounded-sm p-6 space-y-4">
-          <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-gold">Your Details</p>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-medium">Full Name *</label>
+        {/* Price */}
+        <div className="flex items-center justify-between px-5 py-4 bg-card border border-border rounded-sm">
+          <div>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-0.5">Total Price</p>
+            <p className="text-[10px] text-muted-foreground">{selectedSize.size} · {hangers.find(h=>h.id===selectedHanger)?.label}</p>
+          </div>
+          <div className="text-right">
+            <p className="font-display text-3xl text-gold font-bold">${totalPrice}</p>
+            <p className="text-[10px] text-muted-foreground line-through">{selectedSize.original}</p>
+          </div>
+        </div>
+
+        {/* Customer form */}
+        <div className="bg-card border border-border rounded-sm p-5 space-y-4">
+          <p className="text-[10px] tracking-[0.3em] uppercase font-bold text-gold">Your Details</p>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground font-medium">Full Name *</label>
               <input
-                type="text"
-                placeholder="Your full name"
-                value={form.name}
+                type="text" placeholder="Your full name" value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                 className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-medium">Phone *</label>
-              <input
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                value={form.phone}
-                onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground font-medium">Email *</label>
+                <input
+                  type="email" placeholder="you@email.com" value={form.email}
+                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground font-medium">Phone *</label>
+                <input
+                  type="tel" placeholder="+1 (555) 000-0000" value={form.phone}
+                  onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                  className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
+                />
+              </div>
             </div>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-medium">Email *</label>
-            <input
-              type="email"
-              placeholder="you@email.com"
-              value={form.email}
-              onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-              className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
-            />
           </div>
         </div>
 
@@ -342,22 +472,42 @@ function CanvasConfigurator() {
           </div>
         )}
 
-        {/* Submit */}
+        {/* Order button */}
         <button
           onClick={handleOrder}
           disabled={!canSubmit || status === "loading"}
-          className="w-full inline-flex items-center justify-center gap-3 bg-gradient-gold text-white py-4 text-[11px] tracking-[0.3em] uppercase rounded-sm shadow-gold font-bold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full inline-flex items-center justify-center gap-3 bg-gradient-gold text-black py-4 text-[11px] tracking-[0.3em] uppercase rounded-sm shadow-gold font-bold hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {status === "loading" ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
           ) : (
-            <>Order Now    {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
+            <><ShoppingCart className="w-4 h-4" /> Order Now · ${totalPrice}</>
           )}
         </button>
+
+        {!previewUrl && (
+          <p className="text-[10px] text-center text-amber-500/80 tracking-wider">
+            Upload a photo to place your order
+          </p>
+        )}
         <p className="text-[10px] text-center text-muted-foreground tracking-wider">
-          No payment taken at this stage. We'll confirm and follow up within 24 hours.
+          No payment taken at this stage — we'll confirm and follow up within 24 hours.
         </p>
       </div>
+
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+
+      {showEditor && previewUrl && (
+        <ImageEditor
+          imageUrl={previewUrl}
+          onClose={() => setShowEditor(false)}
+          onSave={(base64) => {
+            setPreviewUrl(base64);
+            setUploadedFile(null);
+            setShowEditor(false);
+          }}
+        />
+      )}
     </div>
   );
 }

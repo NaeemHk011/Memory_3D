@@ -19,7 +19,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Graceful fail     if Supabase not configured, rest of site still works
+    if (!supabase) { setLoading(false); return; }
+
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setSession(session);
@@ -41,16 +42,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string) => {
+    if (!supabase) throw new Error("Auth not configured");
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) throw new Error("Auth not configured");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   };
 
   const signOut = async () => {
+    if (!supabase) return;
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
