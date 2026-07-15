@@ -5,6 +5,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/hooks/use-cart";
+import { AuthProvider } from "@/components/site/AuthProvider";
 
 function NotFoundComponent() {
   return (
@@ -70,6 +71,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <CartProvider>
         <Header />
         <main className="min-h-screen">
@@ -78,6 +80,7 @@ function RootComponent() {
         <Footer />
         <Toaster theme="dark" position="bottom-right" />
       </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

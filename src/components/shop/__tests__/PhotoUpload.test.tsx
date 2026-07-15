@@ -25,7 +25,7 @@ beforeEach(() => {
   vi.mocked(URL.createObjectURL).mockReturnValue("blob:mock-url");
 });
 
-describe("PhotoUpload — file validation", () => {
+describe("PhotoUpload     file validation", () => {
   it("accepts a valid image under 10 MB", async () => {
     setup();
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;

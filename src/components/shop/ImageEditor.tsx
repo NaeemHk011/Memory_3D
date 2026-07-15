@@ -224,7 +224,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
   const [cropRatio, setCropRatio] = useState<number | undefined>(undefined);
   const [currentSrc, setCurrentSrc] = useState(imageUrl);
 
-  /* History — single atomic state eliminates index/array race condition */
+  /* History     single atomic state eliminates index/array race condition */
   const [hist, setHist] = useState({ entries: [INIT] as EditorState[], idx: 0 });
   const state = hist.entries[hist.idx];
 
@@ -281,7 +281,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
       entries: [...prev.entries.slice(0, prev.idx + 1), next],
       idx: prev.idx + 1,
     }));
-  }, []); // empty deps — always uses latest prev via functional update
+  }, []); // empty deps     always uses latest prev via functional update
 
   const undo = useCallback(() => {
     setHist(prev => prev.idx > 0 ? { ...prev, idx: prev.idx - 1 } : prev);
@@ -300,7 +300,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
     const el        = canvasElRef.current;
     if (!container || !el) return;
 
-    // Use Canvas2D filter backend — avoids WebGL shader compilation lag/crash on first load
+    // Use Canvas2D filter backend     avoids WebGL shader compilation lag/crash on first load
     if (!(fabric as any).filterBackend) {
       (fabric as any).filterBackend = new (fabric as any).Canvas2dFilterBackend();
     }
@@ -386,7 +386,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSrc]);
 
-  /* Sync filters — debounced so rapid slider drags don't block the main thread */
+  /* Sync filters     debounced so rapid slider drags don't block the main thread */
   useEffect(() => {
     const img = fabricImgRef.current;
     if (!img || !ready) return;
@@ -495,7 +495,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
     });
   };
 
-  /* Text property handlers — update state AND apply to canvas if text selected */
+  /* Text property handlers     update state AND apply to canvas if text selected */
   const txtFont = (v: string) => { setTextFont(v);  setFontDropOpen(false); applyToSelected({ fontFamily: v }); };
   const txtSize = (v: number) => { setTextSize(v);  applyToSelected({ fontSize: v }); };
   const txtColor= (v: string) => { setTextColor(v); applyToSelected({ fill: v }); };
@@ -899,7 +899,7 @@ export function ImageEditor({ imageUrl, onClose, onSave }: Props) {
                 {hasSelectedText ? (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-sm" style={{ background: "rgba(255,138,0,0.08)", border: "1px solid rgba(255,138,0,0.25)" }}>
                     <div className="w-1.5 h-1.5 rounded-full bg-[#FF8A00] animate-pulse shrink-0" />
-                    <span className="text-[10px] text-[#FF8A00]">Text selected — all changes apply live</span>
+                    <span className="text-[10px] text-[#FF8A00]">Text selected     all changes apply live</span>
                   </div>
                 ) : (
                   <div className="px-3 py-2 rounded-sm text-[10px] text-white/25" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>

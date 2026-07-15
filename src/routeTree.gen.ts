@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WeddingsRouteImport } from './routes/weddings'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SculpturesRouteImport } from './routes/sculptures'
 import { Route as MemorialsRouteImport } from './routes/memorials'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -22,10 +25,18 @@ import { Route as AcrylicPrintsRouteImport } from './routes/acrylic-prints'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopProductIdRouteImport } from './routes/shop.$productId'
+import { Route as MemorialCreateRouteImport } from './routes/memorial.create'
+import { Route as MemorialSlugRouteImport } from './routes/memorial.$slug'
+import { Route as MemorialSlugEditRouteImport } from './routes/memorial.$slug.edit'
 
 const WeddingsRoute = WeddingsRouteImport.update({
   id: '/weddings',
   path: '/weddings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopRoute = ShopRouteImport.update({
@@ -41,6 +52,16 @@ const SculpturesRoute = SculpturesRouteImport.update({
 const MemorialsRoute = MemorialsRouteImport.update({
   id: '/memorials',
   path: '/memorials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -88,6 +109,21 @@ const ShopProductIdRoute = ShopProductIdRouteImport.update({
   path: '/$productId',
   getParentRoute: () => ShopRoute,
 } as any)
+const MemorialCreateRoute = MemorialCreateRouteImport.update({
+  id: '/memorial/create',
+  path: '/memorial/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemorialSlugRoute = MemorialSlugRouteImport.update({
+  id: '/memorial/$slug',
+  path: '/memorial/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemorialSlugEditRoute = MemorialSlugEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => MemorialSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,11 +134,17 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/memorials': typeof MemorialsRoute
   '/sculptures': typeof SculpturesRoute
   '/shop': typeof ShopRouteWithChildren
+  '/signup': typeof SignupRoute
   '/weddings': typeof WeddingsRoute
+  '/memorial/$slug': typeof MemorialSlugRouteWithChildren
+  '/memorial/create': typeof MemorialCreateRoute
   '/shop/$productId': typeof ShopProductIdRoute
+  '/memorial/$slug/edit': typeof MemorialSlugEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,11 +155,17 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/memorials': typeof MemorialsRoute
   '/sculptures': typeof SculpturesRoute
   '/shop': typeof ShopRouteWithChildren
+  '/signup': typeof SignupRoute
   '/weddings': typeof WeddingsRoute
+  '/memorial/$slug': typeof MemorialSlugRouteWithChildren
+  '/memorial/create': typeof MemorialCreateRoute
   '/shop/$productId': typeof ShopProductIdRoute
+  '/memorial/$slug/edit': typeof MemorialSlugEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,11 +177,17 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/memorials': typeof MemorialsRoute
   '/sculptures': typeof SculpturesRoute
   '/shop': typeof ShopRouteWithChildren
+  '/signup': typeof SignupRoute
   '/weddings': typeof WeddingsRoute
+  '/memorial/$slug': typeof MemorialSlugRouteWithChildren
+  '/memorial/create': typeof MemorialCreateRoute
   '/shop/$productId': typeof ShopProductIdRoute
+  '/memorial/$slug/edit': typeof MemorialSlugEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,11 +200,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/dashboard'
+    | '/login'
     | '/memorials'
     | '/sculptures'
     | '/shop'
+    | '/signup'
     | '/weddings'
+    | '/memorial/$slug'
+    | '/memorial/create'
     | '/shop/$productId'
+    | '/memorial/$slug/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,11 +221,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/dashboard'
+    | '/login'
     | '/memorials'
     | '/sculptures'
     | '/shop'
+    | '/signup'
     | '/weddings'
+    | '/memorial/$slug'
+    | '/memorial/create'
     | '/shop/$productId'
+    | '/memorial/$slug/edit'
   id:
     | '__root__'
     | '/'
@@ -176,11 +242,17 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/dashboard'
+    | '/login'
     | '/memorials'
     | '/sculptures'
     | '/shop'
+    | '/signup'
     | '/weddings'
+    | '/memorial/$slug'
+    | '/memorial/create'
     | '/shop/$productId'
+    | '/memorial/$slug/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -192,10 +264,15 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
   MemorialsRoute: typeof MemorialsRoute
   SculpturesRoute: typeof SculpturesRoute
   ShopRoute: typeof ShopRouteWithChildren
+  SignupRoute: typeof SignupRoute
   WeddingsRoute: typeof WeddingsRoute
+  MemorialSlugRoute: typeof MemorialSlugRouteWithChildren
+  MemorialCreateRoute: typeof MemorialCreateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/weddings'
       fullPath: '/weddings'
       preLoaderRoute: typeof WeddingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop': {
@@ -226,6 +310,20 @@ declare module '@tanstack/react-router' {
       path: '/memorials'
       fullPath: '/memorials'
       preLoaderRoute: typeof MemorialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -291,6 +389,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopProductIdRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/memorial/create': {
+      id: '/memorial/create'
+      path: '/memorial/create'
+      fullPath: '/memorial/create'
+      preLoaderRoute: typeof MemorialCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/memorial/$slug': {
+      id: '/memorial/$slug'
+      path: '/memorial/$slug'
+      fullPath: '/memorial/$slug'
+      preLoaderRoute: typeof MemorialSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/memorial/$slug/edit': {
+      id: '/memorial/$slug/edit'
+      path: '/edit'
+      fullPath: '/memorial/$slug/edit'
+      preLoaderRoute: typeof MemorialSlugEditRouteImport
+      parentRoute: typeof MemorialSlugRoute
+    }
   }
 }
 
@@ -304,6 +423,18 @@ const ShopRouteChildren: ShopRouteChildren = {
 
 const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 
+interface MemorialSlugRouteChildren {
+  MemorialSlugEditRoute: typeof MemorialSlugEditRoute
+}
+
+const MemorialSlugRouteChildren: MemorialSlugRouteChildren = {
+  MemorialSlugEditRoute: MemorialSlugEditRoute,
+}
+
+const MemorialSlugRouteWithChildren = MemorialSlugRoute._addFileChildren(
+  MemorialSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -313,10 +444,15 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
   MemorialsRoute: MemorialsRoute,
   SculpturesRoute: SculpturesRoute,
   ShopRoute: ShopRouteWithChildren,
+  SignupRoute: SignupRoute,
   WeddingsRoute: WeddingsRoute,
+  MemorialSlugRoute: MemorialSlugRouteWithChildren,
+  MemorialCreateRoute: MemorialCreateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

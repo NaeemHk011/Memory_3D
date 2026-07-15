@@ -35,7 +35,7 @@ function injectSvgClipDefs() {
   document.body.appendChild(svg);
 }
 
-function getShapeClip(id: string): { clip: string; aspect: number } {
+export function getShapeClip(id: string): { clip: string; aspect: number } {
   if (id === "ball")             return { clip: "url(#cp-ball)",     aspect: 1      };
   if (id.includes("heart"))      return { clip: "url(#cp-heart)",    aspect: 0.88   };
   if (id.includes("diamond"))    return { clip: "url(#cp-diamond)",  aspect: 0.72   };

@@ -24,7 +24,9 @@
       "Bash(node -e \"require\\('react-cropper'\\); console.log\\('react-cropper ok'\\)\")",
       "Bash(node *)",
       "Bash(npx kill-port *)",
-      "Bash(pkill -f \"vite dev\")"
+      "Bash(pkill -f \"vite dev\")",
+      "WebFetch(domain:supabase.com)",
+      "Bash(cat C:\\\\\\\\Users\\\\\\\\ADMINI~1\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Users-Administrator-Desktop-TechGenics-Memory-3D\\\\\\\\246f0c7d-b063-4c36-b60d-ffd1f944d74f\\\\\\\\tasks\\\\\\\\buu04rxfu.output)"
     ]
   }
 }
