@@ -136,7 +136,7 @@ function AcrylicConfigurator() {
   const isDragging = useRef(false);
   const dragOrigin = useRef({ mx: 0, my: 0, px: 50, py: 50 });
 
-  // Window-level listeners — work reliably even after size changes / re-renders
+  // Window-level listeners      work reliably even after size changes / re-renders
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
       if (!isDragging.current) return;
@@ -268,7 +268,7 @@ function AcrylicConfigurator() {
             {selectedSize.label}
           </p>
 
-          {/* Preview box — size proportional to real print dimensions */}
+          {/* Preview box      size proportional to real print dimensions */}
           <div
             className="bg-muted/40 border-2 border-dashed border-border rounded-sm overflow-hidden flex items-center justify-center relative transition-all duration-300"
             style={{ width: dims.w, height: dims.h, maxWidth: "100%", cursor: previewUrl ? "grab" : "default" }}
@@ -411,7 +411,7 @@ function AcrylicConfigurator() {
           {status === "loading" ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
           ) : (
-            <>Order Now — {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
+            <>Order Now      {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
           )}
         </button>
         <p className="text-[10px] text-center text-muted-foreground tracking-wider">

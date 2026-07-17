@@ -35,7 +35,7 @@ const sizes = [
 ];
 
 const hangers = [
-  { id: "none",    label: "No Hanger Set",     desc: "Canvas only — no hardware",          price: 0    },
+  { id: "none",    label: "No Hanger Set",     desc: "Canvas only      no hardware",          price: 0    },
   { id: "std",     label: "Standard Hanger",   desc: "Sawtooth + D-rings, ready to hang",  price: 4.99 },
   { id: "deluxe",  label: "Deluxe Wall Mount",  desc: "Premium floating mount system",      price: 9.99 },
 ];
@@ -230,7 +230,7 @@ function CanvasConfigurator() {
       {/* ══ LEFT: Config ══ */}
       <div className="space-y-8">
 
-        {/* Step 1 — Format */}
+        {/* Step 1      Format */}
         <div>
           <div className="flex items-center gap-3 mb-4">
             <span className="w-6 h-6 rounded-full bg-gold text-black text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
@@ -276,7 +276,7 @@ function CanvasConfigurator() {
           </div>
         </div>
 
-        {/* Step 2 — Hanger */}
+        {/* Step 2      Hanger */}
         <div>
           <div className="flex items-center gap-3 mb-4">
             <span className="w-6 h-6 rounded-full bg-gold text-black text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
@@ -310,7 +310,7 @@ function CanvasConfigurator() {
           </div>
         </div>
 
-        {/* Step 3 — Summary */}
+        {/* Step 3      Summary */}
         <div>
           <div className="flex items-center gap-3 mb-4">
             <span className="w-6 h-6 rounded-full bg-gold text-black text-[11px] font-bold flex items-center justify-center shrink-0">3</span>
@@ -343,7 +343,7 @@ function CanvasConfigurator() {
         {/* Image preview */}
         <div className="bg-card border border-border rounded-sm overflow-hidden">
 
-          {/* 3D preview — always on */}
+          {/* 3D preview      always on */}
           {previewUrl ? (
             <div
               className="relative"
@@ -474,7 +474,7 @@ function CanvasConfigurator() {
           </p>
         )}
         <p className="text-[10px] text-center text-muted-foreground tracking-wider">
-          No payment taken at this stage — we'll confirm and follow up within 24 hours.
+          No payment taken at this stage      we'll confirm and follow up within 24 hours.
         </p>
       </div>
 

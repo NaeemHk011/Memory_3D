@@ -261,7 +261,7 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
       <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "#141414", minHeight: 0 }}>
         <canvas ref={canvasElRef} className="absolute inset-0" />
 
-        {/* Crystal PNG overlay — non-interactive, sits on top of photo */}
+        {/* Crystal PNG overlay      non-interactive, sits on top of photo */}
         <img
           src={shape.crystalFramePng}
           alt=""

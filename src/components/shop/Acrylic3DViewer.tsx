@@ -31,7 +31,7 @@ function AcrylicWithPhoto({ url, w, h }: { url: string; w: number; h: number }) 
 
   const mPhoto = useMemo(() => new THREE.MeshBasicMaterial({ map: texture }), [texture]);
   const mBack  = useMemo(() => new THREE.MeshBasicMaterial({ color: "#f5f0e8" }), []);
-  // Four thin acrylic edges — clone so each face gets its own instance
+  // Four thin acrylic edges      clone so each face gets its own instance
   const mR = useMemo(() => new THREE.MeshBasicMaterial({ color: "#cce5ff" }), []);
   const mL = useMemo(() => new THREE.MeshBasicMaterial({ color: "#cce5ff" }), []);
   const mT = useMemo(() => new THREE.MeshBasicMaterial({ color: "#cce5ff" }), []);
