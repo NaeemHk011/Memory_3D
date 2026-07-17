@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { ImageEditor } from "@/components/shop/ImageEditor";
-import { ChevronDown, ChevronUp, ArrowRight, Upload, RotateCcw, Pencil, Loader2, CheckCircle, AlertCircle, ShoppingCart, X } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowRight, Upload, Pencil, Loader2, CheckCircle, AlertCircle, ShoppingCart, X } from "lucide-react";
+import { Canvas3DViewer } from "@/components/shop/Canvas3DViewer";
 import imgFlexibility from "@/assets/canvas-flexibility.png";
 import imgFrames from "@/assets/canvas-frames.png";
 import imgHang from "@/assets/canvas-hang.png";
@@ -141,7 +142,6 @@ function CanvasConfigurator() {
   const [selectedHanger, setSelectedHanger] = useState("none");
   const [previewUrl,     setPreviewUrl]     = useState<string | null>(null);
   const [uploadedFile,   setUploadedFile]   = useState<File | null>(null);
-  const [rotated,        setRotated]        = useState(false);
   const [showEditor,     setShowEditor]     = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [status,   setStatus]   = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -201,21 +201,7 @@ function CanvasConfigurator() {
   const resetPhoto = () => {
     setPreviewUrl(null);
     setUploadedFile(null);
-    setRotated(false);
     if (fileRef.current) fileRef.current.value = "";
-  };
-
-  // Derive rotated aspect class
-  const getAspect = () => {
-    if (!rotated) return selectedSize.aspect;
-    const map: Record<string, string> = {
-      "aspect-square":  "aspect-square",
-      "aspect-[11/14]": "aspect-[14/11]",
-      "aspect-[4/5]":   "aspect-[5/4]",
-      "aspect-[3/4]":   "aspect-[4/3]",
-      "aspect-[2/3]":   "aspect-[3/2]",
-    };
-    return map[selectedSize.aspect] ?? selectedSize.aspect;
   };
 
   if (status === "success") {
@@ -239,7 +225,7 @@ function CanvasConfigurator() {
   const canSubmit = !!(form.name && form.email && form.phone && previewUrl);
 
   return (
-    <div className="grid lg:grid-cols-[1fr_400px] gap-10 items-start">
+    <div className="grid lg:grid-cols-[1fr_520px] gap-10 items-start">
 
       {/* ══ LEFT: Config ══ */}
       <div className="space-y-8">
@@ -352,39 +338,42 @@ function CanvasConfigurator() {
       </div>
 
       {/* ══ RIGHT: Preview + Edit + Form + Order ══ */}
-      <div className="space-y-5 lg:sticky lg:top-28">
+      <div className="space-y-5 lg:sticky lg:top-20">
 
         {/* Image preview */}
         <div className="bg-card border border-border rounded-sm overflow-hidden">
-          <div
-            className={`w-full ${getAspect()} relative overflow-hidden cursor-pointer transition-all duration-300`}
-            onClick={() => !previewUrl && fileRef.current?.click()}
-          >
-            {previewUrl ? (
-              <>
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className={`w-full h-full object-cover transition-transform duration-300 ${rotated ? "rotate-90 scale-[0.75]" : ""}`}
-                />
-                {/* shimmer overlay */}
-                <div className="absolute inset-0 pointer-events-none"
-                  style={{ background: "linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 50%)" }} />
-              </>
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:text-gold transition-colors p-8">
-                <div className="w-16 h-16 rounded-full bg-muted/40 flex items-center justify-center">
-                  <Upload className="w-7 h-7" />
-                </div>
-                <p className="text-[11px] tracking-[0.2em] uppercase font-semibold text-center">
-                  Click to upload your photo
-                </p>
-                <p className="text-[10px] text-muted-foreground text-center">
-                  JPG, PNG or WEBP · Max 10 MB
-                </p>
+
+          {/* 3D preview — always on */}
+          {previewUrl ? (
+            <div
+              className="relative"
+              style={{ height: 520, background: "linear-gradient(160deg,#1a1410 0%,#231c14 60%,#1a1410 100%)" }}
+            >
+              <Canvas3DViewer photoUrl={previewUrl} sizeLabel={selectedSize.label} />
+              <div
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-[9px] tracking-[0.2em] uppercase text-white/30 pointer-events-none select-none"
+                style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", whiteSpace: "nowrap" }}
+              >
+                Drag to rotate
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div
+              className="flex flex-col items-center justify-center gap-3 text-muted-foreground hover:text-gold transition-colors p-8 cursor-pointer"
+              style={{ height: 520 }}
+              onClick={() => fileRef.current?.click()}
+            >
+              <div className="w-20 h-20 rounded-full bg-muted/40 flex items-center justify-center">
+                <Upload className="w-8 h-8" />
+              </div>
+              <p className="text-[12px] tracking-[0.2em] uppercase font-semibold text-center">
+                Click to upload your photo
+              </p>
+              <p className="text-[11px] text-muted-foreground text-center">
+                JPG, PNG or WEBP · Max 10 MB
+              </p>
+            </div>
+          )}
 
           {/* Toolbar */}
           <div className="flex items-center gap-1 p-2 border-t border-border bg-background/50">
@@ -393,12 +382,6 @@ function CanvasConfigurator() {
               className="flex items-center gap-1.5 px-3 py-2 rounded text-[10px] tracking-wide uppercase font-bold text-muted-foreground hover:text-gold hover:bg-gold/5 transition-all"
             >
               <Upload className="w-3.5 h-3.5" /> Upload
-            </button>
-            <button
-              onClick={() => setRotated((v) => !v)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded text-[10px] tracking-wide uppercase font-bold text-muted-foreground hover:text-gold hover:bg-gold/5 transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5" /> Rotate
             </button>
             {previewUrl && (
               <>
