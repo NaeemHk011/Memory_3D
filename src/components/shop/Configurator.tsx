@@ -7,7 +7,7 @@ import { AddonList }       from "@/components/shop/AddonList";
 import { CustomerForm }    from "@/components/shop/CustomerForm";
 import { TotalBar }        from "@/components/shop/TotalBar";
 import { calculateTotal }  from "@/components/shop/PriceCalculator";
-import { LivePreviewPanel, getShapeClip } from "@/components/shop/LivePreviewPanel";
+import { LivePreviewPanel } from "@/components/shop/LivePreviewPanel";
 import { ImageEditor }     from "@/components/shop/ImageEditor";
 import { ImagePositioner } from "@/components/shop/ImagePositioner";
 import { StepWizard }      from "@/components/shop/StepWizard";
@@ -163,7 +163,6 @@ export function Configurator({ shape }: ConfiguratorProps) {
 
   const description   = productDescriptions[shape.id] || "";
   const startingPrice = Math.min(...shape.sizes.map((s) => s.price));
-  const { clip, aspect } = getShapeClip(shape.id);
 
   const checkedAddons = addons.filter((a) => selectedAddons[a.id]?.checked);
 
@@ -319,10 +318,11 @@ export function Configurator({ shape }: ConfiguratorProps) {
                   </p>
                   <div className="flex items-center gap-5">
                     <div
-                      className="shrink-0 w-24"
-                      style={{ aspectRatio: `${aspect}`, clipPath: clip, overflow: "hidden" }}
+                      className="shrink-0 w-24 relative overflow-hidden"
+                      style={{ aspectRatio: `${shape.crystalAspect}` }}
                     >
-                      <img src={photoUrl} alt="Your photo" className="w-full h-full object-cover" />
+                      <img src={photoUrl} alt="Your photo" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={shape.crystalFramePng} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 2 }} />
                     </div>
                     <div className="space-y-1.5">
                       <button
@@ -418,14 +418,17 @@ export function Configurator({ shape }: ConfiguratorProps) {
       {/* Mobile compact preview bar */}
       <div className="lg:hidden mb-6 p-4 bg-card border border-border rounded-2xl flex items-center gap-4">
         <div
-          className="shrink-0 w-14"
-          style={{ aspectRatio: `${aspect}`, clipPath: clip, overflow: "hidden" }}
+          className="shrink-0 w-14 relative overflow-hidden"
+          style={{ aspectRatio: `${shape.crystalAspect}` }}
         >
           {photoUrl ? (
-            <img src={photoUrl} alt="Preview" className="w-full h-full object-cover" />
+            <>
+              <img src={photoUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+              <img src={shape.crystalFramePng} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 2 }} />
+            </>
           ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <img src={shape.thumbImage} alt="" className="w-8 h-8 object-contain opacity-30" />
+            <div className="w-full h-full flex items-center justify-center overflow-hidden">
+              <img src={shape.crystalFramePng} alt="" className="absolute inset-0 w-full h-full object-cover opacity-70" />
             </div>
           )}
         </div>

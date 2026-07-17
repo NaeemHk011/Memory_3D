@@ -11,7 +11,6 @@ interface Props {
 }
 
 interface GuideBounds { cx: number; cy: number; gw: number; gh: number; }
-interface GuideOverlay { svgEl: React.ReactNode; bounds: GuideBounds; w: number; h: number; }
 interface AdjState    { brightness: number; contrast: number; saturation: number; }
 
 type Tab = "position" | "adjust" | "filters";
@@ -27,43 +26,20 @@ const PRESETS = [
   { id: "drama",    label: "Drama"    },
 ];
 
-// ── SVG guide (no Fabric.js) ────────────────────────────────────
-function computeGuide(W: number, H: number, shapeId: string): GuideOverlay {
-  const capW = Math.min(W * 0.38, 420);
-  const capH = Math.min(H * 0.52, 380);
-  const cx = W / 2, cy = H / 2;
-  const S = { fill: "none", stroke: "rgba(255,138,0,0.95)", strokeWidth: 3, strokeDasharray: "10 5" } as const;
-
-  if (shapeId === "ball") {
-    const r = Math.min(capW, capH) / 2;
-    return { svgEl: <circle cx={cx} cy={cy} r={r} fill={S.fill} stroke={S.stroke} strokeWidth={S.strokeWidth} strokeDasharray={S.strokeDasharray} />, bounds: { cx, cy, gw: r*2, gh: r*2 }, w: W, h: H };
-  }
-  if (shapeId.includes("heart")) {
-    const gw = Math.min(capW, capH*(1.04/0.84)), gh = gw*(0.84/1.04);
-    const l = cx-gw/2, t = cy-gh/2, xs = gw/1.04, ys = gh/0.84;
-    const ox = l+0.02*xs, oy = t;
-    const pxx = (n: number) => +(ox+n*xs).toFixed(1);
-    const pyy = (n: number) => +(oy+n*ys).toFixed(1);
-    const d = [`M ${pxx(0.5)} ${pyy(0.22)}`,`C ${pxx(0.5)} ${pyy(0.02)} ${pxx(0.22)} ${pyy(0)} ${pxx(0.08)} ${pyy(0.14)}`,`C ${pxx(-0.02)} ${pyy(0.27)} ${pxx(-0.02)} ${pyy(0.5)} ${pxx(0.5)} ${pyy(0.84)}`,`C ${pxx(1.02)} ${pyy(0.5)} ${pxx(1.02)} ${pyy(0.27)} ${pxx(0.92)} ${pyy(0.14)}`,`C ${pxx(0.78)} ${pyy(0)} ${pxx(0.5)} ${pyy(0.02)} ${pxx(0.5)} ${pyy(0.22)} Z`].join(" ");
-    return { svgEl: <path d={d} fill={S.fill} stroke={S.stroke} strokeWidth={S.strokeWidth} strokeDasharray={S.strokeDasharray} />, bounds: { cx, cy, gw, gh }, w: W, h: H };
-  }
-  if (shapeId.includes("diamond")) {
-    const s = Math.min(capW*0.95, capH*0.95);
-    const pts = [[cx,cy-s*0.47],[cx+s*0.45,cy-s*0.10],[cx+s*0.28,cy+s*0.47],[cx-s*0.28,cy+s*0.47],[cx-s*0.45,cy-s*0.10]].map(p=>p.join(",")).join(" ");
-    return { svgEl: <polygon points={pts} fill={S.fill} stroke={S.stroke} strokeWidth={S.strokeWidth} strokeDasharray={S.strokeDasharray} />, bounds: { cx, cy, gw: s*0.90, gh: s*0.94 }, w: W, h: H };
-  }
-  if (shapeId === "ornament") {
-    const rw = capW/2, rh = Math.min(capH, capW*1.1)/2;
-    return { svgEl: <ellipse cx={cx} cy={cy} rx={rw} ry={rh} fill={S.fill} stroke={S.stroke} strokeWidth={S.strokeWidth} strokeDasharray={S.strokeDasharray} />, bounds: { cx, cy, gw: rw*2, gh: rh*2 }, w: W, h: H };
-  }
-  const isWide=shapeId.includes("wide"), isCandle=shapeId==="candle";
-  const isKey=shapeId.includes("key")||shapeId==="heart-necklace", isDogH=shapeId==="dog-bone-horizontal";
-  const ratio = isKey?0.44:isDogH?1.6:isCandle?0.38:isWide?1/0.75:0.72;
+function getCrystalBounds(W: number, H: number, aspect: number): GuideBounds {
+  const maxW = W * 0.76;
+  const maxH = H * 0.76;
   let gw: number, gh: number;
-  if (isWide||isDogH) { gw=capW; gh=gw/ratio; if(gh>capH){gh=capH;gw=gh*ratio;} }
-  else                { gh=capH; gw=gh*ratio; if(gw>capW){gw=capW;gh=gw/ratio;} }
-  const l=cx-gw/2, t=cy-gh/2, rx=isCandle?Math.min(gw,gh)/2:8;
-  return { svgEl: <rect x={l} y={t} width={gw} height={gh} rx={rx} ry={rx} fill={S.fill} stroke={S.stroke} strokeWidth={S.strokeWidth} strokeDasharray={S.strokeDasharray} />, bounds: { cx, cy, gw, gh }, w: W, h: H };
+  if (aspect >= 1) {
+    gw = Math.min(maxW, maxH * aspect);
+    gh = gw / aspect;
+    if (gh > maxH) { gh = maxH; gw = gh * aspect; }
+  } else {
+    gh = Math.min(maxH, maxW / aspect);
+    gw = gh * aspect;
+    if (gw > maxW) { gw = maxW; gh = gw / aspect; }
+  }
+  return { cx: W / 2, cy: H / 2, gw, gh };
 }
 
 // ── Slider sub-component ────────────────────────────────────────
@@ -89,7 +65,6 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
   const imgRef         = useRef<fabric.Image | null>(null);
   const guideBoundsRef = useRef<GuideBounds | null>(null);
 
-  const [overlay,      setOverlay]      = useState<GuideOverlay | null>(null);
   const [activeTab,    setActiveTab]    = useState<Tab>("position");
   const [adj,          setAdj]          = useState<AdjState>({ brightness: 0, contrast: 0, saturation: 0 });
   const [activePreset, setActivePreset] = useState("original");
@@ -101,7 +76,6 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
     const F = fabric.Image.filters as any;
     const filters: any[] = [];
 
-    // Preset
     if      (preset === "bw")      { filters.push(new F.Grayscale()); }
     else if (preset === "vintage")  { filters.push(new F.Sepia()); filters.push(new F.Brightness({ brightness: -0.1 })); filters.push(new F.Contrast({ contrast: 0.1 })); }
     else if (preset === "vivid")    { filters.push(new F.Saturation({ saturation: 0.8 })); filters.push(new F.Contrast({ contrast: 0.2 })); }
@@ -110,7 +84,6 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
     else if (preset === "cool")     { filters.push(new F.ColorMatrix({ matrix: [0.85,0,0,0,0, 0,1,0,0,0, 0,0,1.15,0,0.05, 0,0,0,1,0] })); }
     else if (preset === "drama")    { filters.push(new F.Contrast({ contrast: 0.35 })); filters.push(new F.Saturation({ saturation: -0.2 })); }
 
-    // Adjustments on top of preset
     if (newAdj.brightness !== 0) filters.push(new F.Brightness({ brightness: newAdj.brightness / 100 }));
     if (newAdj.contrast   !== 0) filters.push(new F.Contrast  ({ contrast:   newAdj.contrast   / 100 }));
     if (newAdj.saturation !== 0) filters.push(new F.Saturation ({ saturation: newAdj.saturation / 100 }));
@@ -131,9 +104,8 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
       const W = container.clientWidth  > 0 ? container.clientWidth  : window.innerWidth;
       const H = container.clientHeight > 0 ? container.clientHeight : window.innerHeight - 120;
 
-      const guide = computeGuide(W, H, shape.id);
-      guideBoundsRef.current = guide.bounds;
-      setOverlay(guide);
+      const bounds = getCrystalBounds(W, H, shape.crystalAspect);
+      guideBoundsRef.current = bounds;
 
       canvas = new fabric.Canvas(el, { width: W, height: H, backgroundColor: "#141414", selection: false });
       fabricRef.current = canvas;
@@ -169,7 +141,7 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
 
     const timer = setTimeout(init, 80);
     return () => { cancelled = true; clearTimeout(timer); try { canvas?.dispose(); } catch {} fabricRef.current = null; imgRef.current = null; guideBoundsRef.current = null; };
-  }, [imageUrl, shape.id]);
+  }, [imageUrl, shape.crystalAspect]);
 
   // ── Controls ───────────────────────────────────────────────────
   const centerImage = () => {
@@ -289,15 +261,25 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
       <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "#141414", minHeight: 0 }}>
         <canvas ref={canvasElRef} className="absolute inset-0" />
 
-        {/* SVG guide overlay — always on top */}
-        {overlay && (
-          <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }} width={overlay.w} height={overlay.h} viewBox={`0 0 ${overlay.w} ${overlay.h}`}>
-            {overlay.svgEl}
-          </svg>
-        )}
+        {/* Crystal PNG overlay — non-interactive, sits on top of photo */}
+        <img
+          src={shape.crystalFramePng}
+          alt=""
+          className="absolute pointer-events-none select-none"
+          style={{
+            zIndex: 10,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "76%",
+            height: "76%",
+            objectFit: "contain",
+            opacity: 0.9,
+          }}
+        />
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-[10px] text-white/25 pointer-events-none" style={{ zIndex:11, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", whiteSpace:"nowrap" }}>
-          Drag photo · Orange outline = crystal area
+          Drag photo to position inside the crystal
         </div>
       </div>
 

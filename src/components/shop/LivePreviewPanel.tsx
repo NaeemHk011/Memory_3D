@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Star, Shield, Truck, RotateCcw, Pencil, Move } from "lucide-react";
 import type { Shape, Size } from "@/data/products";
 
@@ -8,48 +7,6 @@ const trustBadges = [
   { icon: Truck,  label: "10–14 Day Delivery"       },
   { icon: RotateCcw, label: "Satisfaction Guaranteed" },
 ];
-
-function injectSvgClipDefs() {
-  if (document.getElementById("crystal-clip-defs")) return;
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.id = "crystal-clip-defs";
-  svg.setAttribute("width", "0");
-  svg.setAttribute("height", "0");
-  svg.style.cssText = "position:absolute;overflow:hidden;width:0;height:0;top:0;left:0;pointer-events:none;";
-  svg.innerHTML = `
-    <defs>
-      <clipPath id="cp-heart" clipPathUnits="objectBoundingBox">
-        <path d="M 0.5 0.25 C 0.5 0.05 0.25 0 0.1 0.15 C 0 0.28 0 0.5 0.5 0.85 C 1 0.5 1 0.28 0.9 0.15 C 0.75 0 0.5 0.05 0.5 0.25 Z"/>
-      </clipPath>
-      <clipPath id="cp-ball" clipPathUnits="objectBoundingBox">
-        <circle cx="0.5" cy="0.5" r="0.5"/>
-      </clipPath>
-      <clipPath id="cp-diamond" clipPathUnits="objectBoundingBox">
-        <polygon points="0.5,0.05 0.95,0.4 0.78,0.97 0.22,0.97 0.05,0.4"/>
-      </clipPath>
-      <clipPath id="cp-ornament" clipPathUnits="objectBoundingBox">
-        <ellipse cx="0.5" cy="0.5" rx="0.44" ry="0.5"/>
-      </clipPath>
-    </defs>
-  `;
-  document.body.appendChild(svg);
-}
-
-export function getShapeClip(id: string): { clip: string; aspect: number } {
-  if (id === "ball")             return { clip: "url(#cp-ball)",     aspect: 1      };
-  if (id.includes("heart"))      return { clip: "url(#cp-heart)",    aspect: 0.88   };
-  if (id.includes("diamond"))    return { clip: "url(#cp-diamond)",  aspect: 0.72   };
-  if (id === "ornament")         return { clip: "url(#cp-ornament)", aspect: 0.9    };
-  if (id === "candle")           return { clip: "inset(0 round 80px)", aspect: 0.38 };
-  if (id === "urn")              return { clip: "inset(0 round 16px 16px 0 0)", aspect: 0.85 };
-  if (id.includes("wide"))       return { clip: "inset(0 round 6px)", aspect: 1.32  };
-  if (id.includes("tall"))       return { clip: "inset(0 round 6px)", aspect: 0.72  };
-  if (id === "prestige")         return { clip: "inset(0 round 4px)", aspect: 0.75  };
-  if (id.includes("notched"))    return { clip: "inset(0 round 4px)", aspect: 0.72  };
-  if (id === "desk-lamp")        return { clip: "inset(0 round 8px)", aspect: 0.65  };
-  if (id.includes("key"))        return { clip: "inset(0 round 4px)", aspect: 0.44  };
-  return                                { clip: "inset(0 round 8px)", aspect: 0.75  };
-}
 
 interface Props {
   shape: Shape;
@@ -63,9 +20,7 @@ interface Props {
 export function LivePreviewPanel({
   shape, size, photoUrl, totalPrice, onEditClick, onPositionClick,
 }: Props) {
-  useEffect(() => { injectSvgClipDefs(); }, []);
-
-  const { clip, aspect } = getShapeClip(shape.id);
+  const paddingTop = `${(1 / shape.crystalAspect) * 100}%`;
 
   return (
     <div className="lg:sticky lg:top-28 space-y-6">
@@ -79,40 +34,30 @@ export function LivePreviewPanel({
 
       {/* Crystal frame */}
       <div className="w-full max-w-[320px] mx-auto">
-        <div className="relative w-full" style={{ paddingTop: `${(1 / aspect) * 100}%` }}>
-          <div
-            className="absolute inset-0"
-            style={{ clipPath: clip, overflow: "hidden" }}
-          >
+        <div className="relative w-full" style={{ paddingTop }}>
+          <div className="absolute inset-0 overflow-hidden">
             {photoUrl ? (
               <>
                 <img
                   src={photoUrl}
                   alt="Your photo preview"
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
-                {/* Crystal glass shimmer */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 45%, rgba(255,255,255,0.07) 75%, transparent 100%)",
-                  }}
-                />
-                {/* Inner shadow depth */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{ boxShadow: "inset 0 0 40px rgba(0,0,0,0.25), inset 2px 2px 0 rgba(255,255,255,0.08)" }}
+                <img
+                  src={shape.crystalFramePng}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                  style={{ zIndex: 2 }}
                 />
               </>
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-card border border-border gap-3">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                 <img
-                  src={shape.thumbImage}
+                  src={shape.crystalFramePng}
                   alt={shape.label}
-                  className="w-1/2 h-1/2 object-contain opacity-15"
+                  className="absolute inset-0 w-full h-full object-cover opacity-70"
                 />
-                <p className="text-[9px] tracking-[0.25em] uppercase text-muted-foreground text-center px-6">
+                <p className="text-[9px] tracking-[0.25em] uppercase text-muted-foreground text-center px-6 relative" style={{ zIndex: 1 }}>
                   Upload a photo to preview
                 </p>
               </div>

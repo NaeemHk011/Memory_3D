@@ -1,21 +1,14 @@
 // /src/data/products.ts
-import shapeHeart from "@/assets/shape-heart.png";
-import shapeTall from "@/assets/rectangle-tall.png";
-import shapeWide from "@/assets/rectangle-wide-1.png";
-import shapeTall2 from "@/assets/shape-rect-tall-2.png";
-
-import ballImg     from "@/assets/ball.png";
-import prestigeImg from "@/assets/prestige.png";
-import candleImg   from "@/assets/candle.png";
-import diamondImg  from "@/assets/cut-corner-diamond-3.png";
-import dogBoneImg  from "@/assets/dog-bone-vertical-1.png";
-import ornamentImg from "@/assets/ac3d-ornament-new-thumb.png";
-import urnImg      from "@/assets/urn-1.png";
 import deskLampImg from "@/assets/desk-lamp.png";
 
-import keychainVert  from "@/assets/keychain-new-thumb.png";
-import keychainHoriz from "@/assets/keychain-new-horizontal-thumb.png";
-import keychainHeart from "@/assets/heart-keychain.png";
+// Crystal PNG frames (transparent background)
+import crystalDiamond     from "@/assets/crystals/crystal-diamond.png";
+import crystalGemHeart    from "@/assets/crystals/crystal-gem-heart.png";
+import crystalGemRectangle from "@/assets/crystals/crystal-gem-rectangle.png";
+import crystalHeart       from "@/assets/crystals/crystal-heart.png";
+import crystalIceberg     from "@/assets/crystals/crystal-iceberg.png";
+import crystalRectangle   from "@/assets/crystals/crystal-rectangle.png";
+import crystalSquare      from "@/assets/crystals/crystal-square.png";
 
 import c1 from "@/assets/3D_Crystals_1.avif";
 import c2 from "@/assets/3D_Crystals_2.avif";
@@ -24,16 +17,6 @@ import c4 from "@/assets/3D_Crystals_4.avif";
 import c5 from "@/assets/3D_Crystals_5.avif";
 import c6 from "@/assets/3D_Crystals_6.avif";
 
-import m0 from "@/assets/memory_0.avif";
-import m1 from "@/assets/memory_1.avif";
-import m2 from "@/assets/memory_2.avif";
-import m3 from "@/assets/memory_3.avif";
-import m4 from "@/assets/memory_4.avif";
-import m5 from "@/assets/memory_5.avif";
-import m6 from "@/assets/memory_6.avif";
-import m7 from "@/assets/memory_7.avif";
-import m8 from "@/assets/memory_8.avif";
-import m9 from "@/assets/memory_9.avif";
 
 import pHeart  from "@/assets/product-rotating-heart.webp";
 import pSilver from "@/assets/product-lightbase-silver-heart.webp";
@@ -65,6 +48,8 @@ export type Shape = {
   label: string;
   thumbImage: string;
   previewImage: string;
+  crystalFramePng: string;
+  crystalAspect: number; // width/height ratio of the crystal PNG
   sizes: Size[];
   products: ShapeProduct[];
 };
@@ -76,13 +61,15 @@ export const shapes: Shape[] = [
   {
     id: "rectangle-tall",
     label: "Rectangle Tall",
-    thumbImage: shapeTall,
+    thumbImage: crystalRectangle,
     previewImage: c1,
+    crystalFramePng: crystalRectangle,
+    crystalAspect: 0.68,
     products: [
-      { id: "rt-1", name: "Classic Portrait Crystal",  image: m0, badge: "Most Popular" },
-      { id: "rt-2", name: "Family Memory Crystal",     image: m1 },
-      { id: "rt-3", name: "Couple's Keepsake",         image: m2 },
-      { id: "rt-4", name: "Individual Portrait",       image: m3 },
+      { id: "rt-1", name: "Classic Portrait Crystal",  image: c1, badge: "Most Popular" },
+      { id: "rt-2", name: "Family Memory Crystal",     image: c1 },
+      { id: "rt-3", name: "Couple's Keepsake Crystal", image: c1 },
+      { id: "rt-4", name: "Individual Portrait Crystal", image: c1 },
       { id: "rt-5", name: "Premium Portrait Crystal",  image: c1 },
     ],
     sizes: [
@@ -99,13 +86,15 @@ export const shapes: Shape[] = [
   {
     id: "rectangle-wide",
     label: "Rectangle Wide",
-    thumbImage: shapeWide,
+    thumbImage: crystalGemRectangle,
     previewImage: c2,
+    crystalFramePng: crystalGemRectangle,
+    crystalAspect: 0.68,
     products: [
-      { id: "rw-1", name: "Group Photo Crystal",   image: m4, badge: "Bestseller" },
-      { id: "rw-2", name: "Landscape Memory",      image: m5 },
-      { id: "rw-3", name: "Family Panorama",       image: m6 },
-      { id: "rw-4", name: "Wide Format Crystal",   image: c2 },
+      { id: "rw-1", name: "Wide Rectangle Crystal",   image: c2, badge: "Bestseller" },
+      { id: "rw-2", name: "Landscape Memory Crystal", image: c2 },
+      { id: "rw-3", name: "Family Panorama Crystal",  image: c2 },
+      { id: "rw-4", name: "Wide Format Crystal",      image: c2 },
     ],
     sizes: [
       { id: "medium",             label: "Medium",             people: "1-2",  dimensions: "3x2x2 / 8x5x5cm",       price: 100 },
@@ -122,13 +111,15 @@ export const shapes: Shape[] = [
   {
     id: "heart",
     label: "Heart",
-    thumbImage: shapeHeart,
+    thumbImage: crystalHeart,
     previewImage: pHeart,
+    crystalFramePng: crystalHeart,
+    crystalAspect: 1.04,
     products: [
       { id: "h-1", name: "Wedding Heart Crystal",  image: pHeart,  badge: "Top Gift" },
       { id: "h-2", name: "Heart with Silver Base", image: pSilver },
-      { id: "h-3", name: "Romantic Heart Gift",    image: m7 },
-      { id: "h-4", name: "Love Memory Crystal",    image: m8 },
+      { id: "h-3", name: "Romantic Heart Gift",    image: pHeart },
+      { id: "h-4", name: "Heart Anniversary Crystal", image: pSilver },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1-2", dimensions: "3.2x2.8x1.6 / 8x7x4cm",  price: 89  },
@@ -141,12 +132,14 @@ export const shapes: Shape[] = [
   {
     id: "prestige",
     label: "Prestige",
-    thumbImage: prestigeImg,
+    thumbImage: crystalSquare,
     previewImage: c4,
+    crystalFramePng: crystalSquare,
+    crystalAspect: 1.0,
     products: [
       { id: "pr-1", name: "Prestige Beveled Crystal", image: c4,   badge: "Premium" },
       { id: "pr-2", name: "Prestige with Wood Base",  image: pWood },
-      { id: "pr-3", name: "Prestige Gift Set",        image: m9 },
+      { id: "pr-3", name: "Prestige Crystal Gift Set", image: c4 },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1-2", dimensions: "5x4.3x2.4 / 13x11x6cm",   price: 225 },
@@ -159,8 +152,10 @@ export const shapes: Shape[] = [
   {
     id: "ball",
     label: "Ball",
-    thumbImage: ballImg,
+    thumbImage: crystalDiamond,
     previewImage: c6,
+    crystalFramePng: crystalDiamond,
+    crystalAspect: 1.0,
     products: [
       { id: "bl-1", name: "Optical Ball Crystal", image: c6 },
     ],
@@ -173,8 +168,10 @@ export const shapes: Shape[] = [
   {
     id: "cut-corner-diamond",
     label: "Cut Corner Diamond",
-    thumbImage: diamondImg,
+    thumbImage: crystalDiamond,
     previewImage: c3,
+    crystalFramePng: crystalDiamond,
+    crystalAspect: 1.0,
     products: [
       { id: "cd-1", name: "Diamond Cut Crystal", image: c3, badge: "Great Value" },
     ],
@@ -189,8 +186,10 @@ export const shapes: Shape[] = [
   {
     id: "vertical-keychain",
     label: "Vertical Keychain",
-    thumbImage: keychainVert,
+    thumbImage: crystalRectangle,
     previewImage: pKey,
+    crystalFramePng: crystalRectangle,
+    crystalAspect: 0.68,
     products: [
       { id: "vk-1", name: "Vertical Crystal Keychain", image: pKey,   badge: "Gift Idea" },
       { id: "vk-2", name: "Mini Portrait Keychain",    image: heartKey1 },
@@ -204,8 +203,10 @@ export const shapes: Shape[] = [
   {
     id: "horizontal-keychain",
     label: "Horizontal Keychain",
-    thumbImage: keychainHoriz,
+    thumbImage: crystalGemRectangle,
     previewImage: pKey,
+    crystalFramePng: crystalGemRectangle,
+    crystalAspect: 0.68,
     products: [
       { id: "hk-1", name: "Horizontal Crystal Keychain", image: pKey      },
       { id: "hk-2", name: "Landscape Keychain Crystal",  image: heartKey1 },
@@ -219,8 +220,10 @@ export const shapes: Shape[] = [
   {
     id: "heart-keychain",
     label: "Heart Keychain",
-    thumbImage: keychainHeart,
+    thumbImage: crystalGemHeart,
     previewImage: heartKey1,
+    crystalFramePng: crystalGemHeart,
+    crystalAspect: 1.0,
     products: [
       { id: "hck-1", name: "Heart Crystal Keychain", image: heartKey1, badge: "Gift Idea" },
       { id: "hck-2", name: "Mini Heart Keychain",    image: pKey },
@@ -234,8 +237,10 @@ export const shapes: Shape[] = [
   {
     id: "heart-necklace",
     label: "Heart Necklace",
-    thumbImage: keychainHeart,
+    thumbImage: crystalGemHeart,
     previewImage: pSilver,
+    crystalFramePng: crystalGemHeart,
+    crystalAspect: 1.0,
     products: [
       { id: "hn-1", name: "Heart Necklace Pendant",  image: heartKey1 },
       { id: "hn-2", name: "Silver Heart Necklace",   image: pSilver },
@@ -249,8 +254,10 @@ export const shapes: Shape[] = [
   {
     id: "ornament",
     label: "Ornament",
-    thumbImage: ornamentImg,
+    thumbImage: crystalSquare,
     previewImage: c5,
+    crystalFramePng: crystalSquare,
+    crystalAspect: 1.0,
     products: [
       { id: "or-1", name: "Holiday Ornament Crystal", image: c5, badge: "Seasonal" },
     ],
@@ -263,8 +270,10 @@ export const shapes: Shape[] = [
   {
     id: "candle",
     label: "Candle",
-    thumbImage: candleImg,
+    thumbImage: crystalIceberg,
     previewImage: c6,
+    crystalFramePng: crystalIceberg,
+    crystalAspect: 0.73,
     products: [
       { id: "ca-1", name: "Candle Crystal", image: c6 },
     ],
@@ -277,8 +286,10 @@ export const shapes: Shape[] = [
   {
     id: "urn",
     label: "Urn / Candles",
-    thumbImage: urnImg,
+    thumbImage: crystalIceberg,
     previewImage: c4,
+    crystalFramePng: crystalIceberg,
+    crystalAspect: 0.73,
     products: [
       { id: "ur-1", name: "Memorial Urn Crystal", image: c4 },
     ],
@@ -291,8 +302,10 @@ export const shapes: Shape[] = [
   {
     id: "notched-tall",
     label: "Notched Tall",
-    thumbImage: shapeTall2,
+    thumbImage: crystalRectangle,
     previewImage: c1,
+    crystalFramePng: crystalRectangle,
+    crystalAspect: 0.68,
     products: [
       { id: "nt-1", name: "Notched Tall Crystal", image: c1 },
     ],
@@ -306,8 +319,10 @@ export const shapes: Shape[] = [
   {
     id: "notched-wide",
     label: "Notched Wide",
-    thumbImage: shapeWide,
+    thumbImage: crystalGemRectangle,
     previewImage: c2,
+    crystalFramePng: crystalGemRectangle,
+    crystalAspect: 0.68,
     products: [
       { id: "nw-1", name: "Notched Wide Crystal",  image: c2 },
     ],
@@ -321,8 +336,10 @@ export const shapes: Shape[] = [
   {
     id: "dog-bone-vertical",
     label: "Dog Bone Vertical",
-    thumbImage: dogBoneImg,
+    thumbImage: crystalIceberg,
     previewImage: c1,
+    crystalFramePng: crystalIceberg,
+    crystalAspect: 0.73,
     products: [
       { id: "dbv-1", name: "Dog Bone Crystal (Vertical)", image: c1 },
     ],
@@ -335,8 +352,10 @@ export const shapes: Shape[] = [
   {
     id: "dog-bone-horizontal",
     label: "Dog Bone Horizontal",
-    thumbImage: dogBoneImg,
+    thumbImage: crystalGemRectangle,
     previewImage: c2,
+    crystalFramePng: crystalGemRectangle,
+    crystalAspect: 0.68,
     products: [
       { id: "dbh-1", name: "Dog Bone Crystal (Horizontal)", image: c2 },
     ],
@@ -349,8 +368,10 @@ export const shapes: Shape[] = [
   {
     id: "desk-lamp",
     label: "Desk Lamp",
-    thumbImage: deskLampImg,
+    thumbImage: crystalRectangle,
     previewImage: deskLampImg,
+    crystalFramePng: crystalRectangle,
+    crystalAspect: 0.68,
     products: [
       { id: "dl-1", name: "Crystal Desk Lamp", image: pWood },
     ],

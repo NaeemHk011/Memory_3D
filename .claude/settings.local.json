@@ -26,7 +26,25 @@
       "Bash(npx kill-port *)",
       "Bash(pkill -f \"vite dev\")",
       "WebFetch(domain:supabase.com)",
-      "Bash(cat C:\\\\\\\\Users\\\\\\\\ADMINI~1\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Users-Administrator-Desktop-TechGenics-Memory-3D\\\\\\\\246f0c7d-b063-4c36-b60d-ffd1f944d74f\\\\\\\\tasks\\\\\\\\buu04rxfu.output)"
+      "Bash(cat C:\\\\\\\\Users\\\\\\\\ADMINI~1\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Users-Administrator-Desktop-TechGenics-Memory-3D\\\\\\\\246f0c7d-b063-4c36-b60d-ffd1f944d74f\\\\\\\\tasks\\\\\\\\buu04rxfu.output)",
+      "Bash(mkdir -p /c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals)",
+      "Bash(cp \"/c/Users/Administrator/Downloads/3D crystal - PNG/3D crystal - PNG/Diamond.png\" /c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/)",
+      "Bash(cp \"/c/Users/Administrator/Downloads/3D crystal - PNG/3D crystal - PNG/Gem Heart.png\" /c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/)",
+      "Bash(cp \"/c/Users/Administrator/Downloads/3D crystal - PNG/3D crystal - PNG/Gem Rectangle.png\" /c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/)",
+      "Bash(cp \"/c/Users/Administrator/Downloads/3D crystal - PNG/3D crystal - PNG/Heart.png\" /c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/)",
+      "Bash(mv \"Diamond.png\" \"crystal-diamond.png\")",
+      "Bash(mv \"Gem Heart.png\" \"crystal-gem-heart.png\")",
+      "Bash(mv \"Gem Rectangle.png\" \"crystal-gem-rectangle.png\")",
+      "Bash(mv \"Heart.png\" \"crystal-heart.png\")",
+      "Bash(mv \"Iceberg.png\" \"crystal-iceberg.png\")",
+      "Bash(pkill -f \"vite.*5174\")",
+      "Bash(unzip -o \"/c/Users/Administrator/Downloads/3D crystal - PNG \\(2\\).zip\" -d crystal_new)",
+      "Read(//c/tmp/**)",
+      "Bash(cp \"3D crystal shapes-01.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-heart.png\")",
+      "Bash(cp \"3D crystal shapes-01.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-gem-heart.png\")",
+      "Bash(cp \"3D crystal shapes-02.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-rectangle.png\")",
+      "Bash(cp \"3D crystal shapes-03.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-square.png\")",
+      "Bash(cp \"3D crystal shapes-04.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-gem-rectangle.png\")"
     ]
   }
 }
