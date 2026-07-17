@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { ChevronDown, ChevronUp, ArrowRight, Upload, RotateCcw, Loader2, CheckCircle, AlertCircle, Pencil } from "lucide-react";
 import { ImageEditor } from "@/components/shop/ImageEditor";
@@ -107,16 +107,67 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+/* Preview box dims proportional to real print size.
+   Label format WxH: 5x7 = 5" wide, 7" tall.
+   7" (smallest max-dim) → 200px, 30" (largest) → 320px. */
+function getPreviewDims(sizeLabel: string, rotated: boolean): { w: number; h: number } {
+  const parts = sizeLabel.split("x").map(Number);
+  const printH = parts[0] || 1; // first number = height  e.g. "20" in "20x30"
+  const printW = parts[1] || 1; // second number = width   e.g. "30" in "20x30"
+  const realMax = Math.max(printW, printH);
+  const maxPx = Math.round(260 + ((realMax - 7) / (30 - 7)) * 160);
+  const aspect = printW / printH;
+  const w = aspect >= 1 ? maxPx : Math.round(maxPx * aspect);
+  const h = aspect >= 1 ? Math.round(maxPx / aspect) : maxPx;
+  return rotated ? { w: h, h: w } : { w, h };
+}
+
 function AcrylicConfigurator() {
   const [selectedSize, setSelectedSize] = useState(sizes[1]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl,   setPreviewUrl]   = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [rotated, setRotated] = useState(false);
-  const [showEditor, setShowEditor] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [rotated,      setRotated]      = useState(false);
+  const [showEditor,   setShowEditor]   = useState(false);
+  const [imgPos,       setImgPos]       = useState({ x: 50, y: 50 });
+  const [form,    setForm]    = useState({ name: "", email: "", phone: "" });
+  const [status,  setStatus]  = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileRef    = useRef<HTMLInputElement>(null);
+  const isDragging = useRef(false);
+  const dragOrigin = useRef({ mx: 0, my: 0, px: 50, py: 50 });
+
+  // Window-level listeners — work reliably even after size changes / re-renders
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - dragOrigin.current.mx;
+      const dy = e.clientY - dragOrigin.current.my;
+      setImgPos({
+        x: Math.max(0, Math.min(100, dragOrigin.current.px - dx * 0.25)),
+        y: Math.max(0, Math.min(100, dragOrigin.current.py - dy * 0.25)),
+      });
+    };
+    const onUp = () => { isDragging.current = false; };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup",   onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup",   onUp);
+    };
+  }, []);
+
+  // Reset position and drag state on image upload or size change
+  useEffect(() => {
+    setImgPos({ x: 50, y: 50 });
+    isDragging.current = false;
+  }, [previewUrl, selectedSize.label]);
+
+  const onImgPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!previewUrl) return;
+    e.preventDefault();
+    isDragging.current = true;
+    dragOrigin.current = { mx: e.clientX, my: e.clientY, px: imgPos.x, py: imgPos.y };
+  };
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,36 +176,31 @@ function AcrylicConfigurator() {
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  const toBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-    });
-
   const handleEditorSave = (editedBase64: string) => {
     setPreviewUrl(editedBase64);
     setShowEditor(false);
   };
 
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload  = () => resolve(reader.result as string);
+      reader.onerror = reject;
+    });
+
   const handleOrder = async () => {
     setStatus("loading");
     setErrorMsg("");
     try {
-      // If user edited the image, previewUrl is already a base64 string
       const photoBase64 = previewUrl?.startsWith("data:")
         ? previewUrl
-        : uploadedFile
-        ? await toBase64(uploadedFile)
-        : null;
+        : uploadedFile ? await toBase64(uploadedFile) : null;
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
+          name: form.name, email: form.email, phone: form.phone,
           cartItems: [{ shapeLabel: "Acrylic Print", sizeLabel: selectedSize.size, price: parseFloat(selectedSize.price.replace("$", "")) }],
           totalPrice: parseFloat(selectedSize.price.replace("$", "")),
           photoBase64,
@@ -189,6 +235,7 @@ function AcrylicConfigurator() {
   }
 
   const canSubmit = form.name && form.email && form.phone && uploadedFile;
+  const dims = getPreviewDims(selectedSize.label, rotated);
 
   return (
     <div className="grid lg:grid-cols-2 gap-10 items-start">
@@ -220,11 +267,27 @@ function AcrylicConfigurator() {
           <p className="text-[11px] tracking-[0.3em] uppercase font-bold text-gold">
             {selectedSize.label}
           </p>
+
+          {/* Preview box — size proportional to real print dimensions */}
           <div
-            className={`w-full max-w-[320px] ${rotated ? (selectedSize.aspect === "aspect-square" ? "aspect-square" : selectedSize.aspect === "aspect-[5/7]" ? "aspect-[7/5]" : selectedSize.aspect === "aspect-[4/5]" ? "aspect-[5/4]" : selectedSize.aspect === "aspect-[11/14]" ? "aspect-[14/11]" : selectedSize.aspect === "aspect-[3/4]" ? "aspect-[4/3]" : selectedSize.aspect === "aspect-[2/3]" ? "aspect-[3/2]" : selectedSize.aspect) : selectedSize.aspect} bg-muted/40 border-2 border-dashed border-border rounded-sm overflow-hidden flex items-center justify-center relative transition-all duration-300`}
+            className="bg-muted/40 border-2 border-dashed border-border rounded-sm overflow-hidden flex items-center justify-center relative transition-all duration-300"
+            style={{ width: dims.w, height: dims.h, maxWidth: "100%", cursor: previewUrl ? "grab" : "default" }}
+            onPointerDown={onImgPointerDown}
           >
             {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className={`w-full h-full object-contain transition-transform duration-300 ${rotated ? "rotate-90" : ""}`} />
+              <>
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  draggable={false}
+                  className={`w-full h-full object-cover transition-transform duration-300 pointer-events-none select-none ${rotated ? "rotate-90" : ""}`}
+                  style={{ objectPosition: `${imgPos.x}% ${imgPos.y}%` }}
+                />
+                <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full text-[8px] tracking-[0.15em] uppercase text-white/50 pointer-events-none select-none"
+                  style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", whiteSpace: "nowrap" }}>
+                  Drag to reposition
+                </div>
+              </>
             ) : (
               <button
                 onClick={() => fileRef.current?.click()}
@@ -235,6 +298,7 @@ function AcrylicConfigurator() {
               </button>
             )}
           </div>
+
           {previewUrl && (
             <div className="flex items-center gap-5">
               <button
@@ -256,7 +320,6 @@ function AcrylicConfigurator() {
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
 
-      {/* ── Image Editor Modal ── */}
       {showEditor && previewUrl && (
         <ImageEditor
           imageUrl={previewUrl}
@@ -309,9 +372,7 @@ function AcrylicConfigurator() {
             <div className="space-y-1.5">
               <label className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-medium">Full Name *</label>
               <input
-                type="text"
-                placeholder="Your full name"
-                value={form.name}
+                type="text" placeholder="Your full name" value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                 className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
               />
@@ -319,9 +380,7 @@ function AcrylicConfigurator() {
             <div className="space-y-1.5">
               <label className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-medium">Phone *</label>
               <input
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                value={form.phone}
+                type="tel" placeholder="+1 (555) 000-0000" value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                 className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
               />
@@ -330,9 +389,7 @@ function AcrylicConfigurator() {
           <div className="space-y-1.5">
             <label className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-medium">Email *</label>
             <input
-              type="email"
-              placeholder="you@email.com"
-              value={form.email}
+              type="email" placeholder="you@email.com" value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
               className="w-full bg-background border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
             />
@@ -354,7 +411,7 @@ function AcrylicConfigurator() {
           {status === "loading" ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
           ) : (
-            <>Order Now    {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
+            <>Order Now — {selectedSize.price} <ArrowRight className="w-4 h-4" /></>
           )}
         </button>
         <p className="text-[10px] text-center text-muted-foreground tracking-wider">

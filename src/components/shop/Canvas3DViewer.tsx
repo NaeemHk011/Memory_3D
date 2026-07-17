@@ -3,21 +3,28 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
-/* ── Size label → canvas [w, h] in 3D units ─────────────────── */
-function canvasDims(sizeLabel: string): [number, number] {
-  const map: Record<string, [number, number]> = {
-    "8x8":   [1.62, 1.62],
-    "11x14": [1.27, 1.62],
-    "12x12": [1.62, 1.62],
-    "16x20": [1.42, 1.78],
-    "18x24": [1.35, 1.80],
-    "24x36": [1.20, 1.80],
-    "30x40": [1.35, 1.80],
-  };
-  return map[sizeLabel] ?? [1.5, 1.5];
-}
-
 const DEPTH = 0.14;
+
+/*
+  Label format is HEIGHTxWIDTH  e.g. "30x40" = 30" tall, 40" wide.
+  Scale: 8" (smallest) → 0.875 world-units, 40" (largest) → 1.75 world-units.
+  Linear mapping keeps relative size differences visible while all sizes stay
+  large enough to see clearly at the default camera distance.
+*/
+function canvasDims(sizeLabel: string): [number, number] {
+  const parts = sizeLabel.toLowerCase().split("x").map(Number);
+  const printH = parts[0] || 1;
+  const printW = parts[1] || 1;
+
+  const realMax  = Math.max(printW, printH);
+  const scale3D  = 0.5 + ((realMax - 8) / (40 - 8)) * 0.5; // 8"→0.5, 40"→1.0
+  const maxDim3D = 1.75 * scale3D;
+
+  const aspect = printW / printH;
+  return aspect >= 1
+    ? [maxDim3D, maxDim3D / aspect]     // landscape / square
+    : [maxDim3D * aspect, maxDim3D];    // portrait
+}
 
 /* ── Helper: clone base texture with UV crop ─────────────────── */
 function makeMat(base: THREE.Texture, ox: number, oy: number, rx: number, ry: number) {
@@ -35,8 +42,8 @@ function makeMat(base: THREE.Texture, ox: number, oy: number, rx: number, ry: nu
 function CanvasWithPhoto({ url, w, h }: { url: string; w: number; h: number }) {
   const base = useTexture(url);
 
-  const wx = DEPTH / w; // fraction of image that wraps on left/right
-  const wy = DEPTH / h; // fraction of image that wraps on top/bottom
+  const wx = DEPTH / w;
+  const wy = DEPTH / h;
 
   // BoxGeometry material index order: +x(right), -x(left), +y(top), -y(bottom), +z(front), -z(back)
   const mRight  = useMemo(() => makeMat(base, 1 - wx, 0,      wx, 1),  [base, wx]);
@@ -70,8 +77,7 @@ function CanvasEmpty({ w, h }: { w: number; h: number }) {
 }
 
 /* ── Model wrapper ───────────────────────────────────────────── */
-function CanvasModel({ photoUrl, sizeLabel }: { photoUrl: string | null; sizeLabel: string }) {
-  const [w, h] = canvasDims(sizeLabel);
+function CanvasModel({ photoUrl, w, h }: { photoUrl: string | null; w: number; h: number }) {
   return photoUrl ? (
     <Suspense fallback={<CanvasEmpty w={w} h={h} />}>
       <CanvasWithPhoto url={photoUrl} w={w} h={h} />
@@ -88,14 +94,23 @@ interface Props {
 }
 
 export function Canvas3DViewer({ photoUrl, sizeLabel }: Props) {
+  const [w, h] = canvasDims(sizeLabel);
+  const sizeScale = Math.max(w, h) / 1.75; // 0.5 for 8x8, 1.0 for 30x40
+
+  // Camera X/Y offset scales with canvas size; Z stays fixed so sizes look different
+  const camX = 0.6 * sizeScale;
+  const camY = 0.2 * sizeScale;
+
   return (
+    // key resets camera & OrbitControls when size changes
     <Canvas
-      camera={{ position: [0.6, 0.2, 3.0], fov: 46 }}
+      key={sizeLabel}
+      camera={{ position: [camX, camY, 3.0], fov: 46 }}
       gl={{ antialias: true, alpha: true }}
       dpr={[1, 2]}
       style={{ background: "transparent" }}
     >
-      <CanvasModel photoUrl={photoUrl} sizeLabel={sizeLabel} />
+      <CanvasModel photoUrl={photoUrl} w={w} h={h} />
 
       <OrbitControls
         enablePan={false}
