@@ -1,4 +1,4 @@
-import { Star, Shield, Truck, RotateCcw, Pencil, Move } from "lucide-react";
+import { Star, Shield, Truck, RotateCcw, Move } from "lucide-react";
 import type { Shape, Size } from "@/data/products";
 
 const trustBadges = [
@@ -13,12 +13,11 @@ interface Props {
   size: Size;
   photoUrl: string | null;
   totalPrice: number;
-  onEditClick: () => void;
   onPositionClick: () => void;
 }
 
 export function LivePreviewPanel({
-  shape, size, photoUrl, totalPrice, onEditClick, onPositionClick,
+  shape, size, photoUrl, totalPrice, onPositionClick,
 }: Props) {
   const paddingTop = `${(1 / shape.crystalAspect) * 100}%`;
 
@@ -42,6 +41,7 @@ export function LivePreviewPanel({
                   src={photoUrl}
                   alt="Your photo preview"
                   className="absolute inset-0 w-full h-full object-cover"
+                  style={{ filter: "grayscale(100%)" }}
                 />
                 <img
                   src={shape.crystalFramePng}
@@ -66,15 +66,9 @@ export function LivePreviewPanel({
         </div>
       </div>
 
-      {/* Edit / Position buttons */}
+      {/* Position button */}
       {photoUrl && (
         <div className="flex gap-2 max-w-[320px] mx-auto w-full">
-          <button
-            onClick={onEditClick}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border text-[10px] tracking-[0.15em] uppercase font-bold text-muted-foreground hover:text-gold hover:border-gold/40 transition-all cursor-pointer"
-          >
-            <Pencil className="w-3.5 h-3.5" /> Edit
-          </button>
           <button
             onClick={onPositionClick}
             className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-gold/40 text-[10px] tracking-[0.15em] uppercase font-bold text-gold hover:bg-gold/5 transition-all cursor-pointer"

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { fabric } from "fabric";
-import { X, Check, Move, ZoomIn, ZoomOut, RotateCcw as RotateIcon, Sliders, Sparkles } from "lucide-react";
+import { X, Check, Move, ZoomIn, ZoomOut, RotateCcw as RotateIcon } from "lucide-react";
 import type { Shape } from "@/data/products";
 
 interface Props {
@@ -11,20 +11,6 @@ interface Props {
 }
 
 interface GuideBounds { cx: number; cy: number; gw: number; gh: number; }
-interface AdjState    { brightness: number; contrast: number; saturation: number; }
-
-type Tab = "position" | "adjust" | "filters";
-
-const PRESETS = [
-  { id: "original", label: "Original" },
-  { id: "bw",       label: "B&W"      },
-  { id: "vintage",  label: "Vintage"  },
-  { id: "vivid",    label: "Vivid"    },
-  { id: "soft",     label: "Soft"     },
-  { id: "warm",     label: "Warm"     },
-  { id: "cool",     label: "Cool"     },
-  { id: "drama",    label: "Drama"    },
-];
 
 function getCrystalBounds(W: number, H: number, aspect: number): GuideBounds {
   const maxW = W * 0.76;
@@ -42,21 +28,6 @@ function getCrystalBounds(W: number, H: number, aspect: number): GuideBounds {
   return { cx: W / 2, cy: H / 2, gw, gh };
 }
 
-// ── Slider sub-component ────────────────────────────────────────
-function AdjSlider({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-[10px] text-white/40 w-20 uppercase tracking-wider shrink-0">{label}</span>
-      <input
-        type="range" min={-100} max={100} value={value}
-        onChange={e => onChange(Number(e.target.value))}
-        className="flex-1 h-1 rounded-full cursor-pointer accent-[#FF8A00]"
-      />
-      <span className="text-[10px] text-white/40 w-8 text-right tabular-nums shrink-0">{value > 0 ? `+${value}` : value}</span>
-    </div>
-  );
-}
-
 // ── Main component ──────────────────────────────────────────────
 export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
   const containerRef   = useRef<HTMLDivElement>(null);
@@ -65,33 +36,6 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
   const imgRef         = useRef<fabric.Image | null>(null);
   const guideBoundsRef = useRef<GuideBounds | null>(null);
 
-  const [activeTab,    setActiveTab]    = useState<Tab>("position");
-  const [adj,          setAdj]          = useState<AdjState>({ brightness: 0, contrast: 0, saturation: 0 });
-  const [activePreset, setActivePreset] = useState("original");
-
-  // ── Apply Fabric.js image filters ──────────────────────────────
-  const applyFilters = useCallback((newAdj: AdjState, preset: string) => {
-    const img = imgRef.current, c = fabricRef.current;
-    if (!img || !c) return;
-    const F = fabric.Image.filters as any;
-    const filters: any[] = [];
-
-    if      (preset === "bw")      { filters.push(new F.Grayscale()); }
-    else if (preset === "vintage")  { filters.push(new F.Sepia()); filters.push(new F.Brightness({ brightness: -0.1 })); filters.push(new F.Contrast({ contrast: 0.1 })); }
-    else if (preset === "vivid")    { filters.push(new F.Saturation({ saturation: 0.8 })); filters.push(new F.Contrast({ contrast: 0.2 })); }
-    else if (preset === "soft")     { filters.push(new F.Brightness({ brightness: 0.08 })); filters.push(new F.Saturation({ saturation: -0.2 })); }
-    else if (preset === "warm")     { filters.push(new F.ColorMatrix({ matrix: [1.1,0,0,0,0.05, 0,1,0,0,0, 0,0,0.85,0,0, 0,0,0,1,0] })); }
-    else if (preset === "cool")     { filters.push(new F.ColorMatrix({ matrix: [0.85,0,0,0,0, 0,1,0,0,0, 0,0,1.15,0,0.05, 0,0,0,1,0] })); }
-    else if (preset === "drama")    { filters.push(new F.Contrast({ contrast: 0.35 })); filters.push(new F.Saturation({ saturation: -0.2 })); }
-
-    if (newAdj.brightness !== 0) filters.push(new F.Brightness({ brightness: newAdj.brightness / 100 }));
-    if (newAdj.contrast   !== 0) filters.push(new F.Contrast  ({ contrast:   newAdj.contrast   / 100 }));
-    if (newAdj.saturation !== 0) filters.push(new F.Saturation ({ saturation: newAdj.saturation / 100 }));
-
-    img.filters = filters;
-    img.applyFilters();
-    c.renderAll();
-  }, []);
 
   // ── Canvas init ────────────────────────────────────────────────
   useEffect(() => {
@@ -169,71 +113,6 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
     onSave(dataUrl);
   }, [onSave]);
 
-  // ── Tab content ─────────────────────────────────────────────────
-  const renderTabContent = () => {
-    if (activeTab === "position") {
-      return (
-        <div className="flex items-center justify-center gap-2 py-3 px-4 flex-wrap">
-          {([
-            { label: "Zoom Out",   Icon: ZoomOut,    action: () => zoomImg(-1) },
-            { label: "Center",     Icon: Move,       action: centerImage },
-            { label: "Rotate 90°", Icon: RotateIcon, action: rotateImg },
-            { label: "Zoom In",    Icon: ZoomIn,     action: () => zoomImg(1) },
-          ] as const).map(({ label, Icon, action }) => (
-            <button key={label} onClick={action} className="flex items-center gap-1.5 px-4 py-2 rounded-sm border border-white/10 text-white/50 hover:text-white hover:border-white/20 text-[11px] transition-all">
-              <Icon className="w-3.5 h-3.5" /> {label}
-            </button>
-          ))}
-        </div>
-      );
-    }
-
-    if (activeTab === "adjust") {
-      return (
-        <div className="py-4 px-6 space-y-4">
-          {(["brightness", "contrast", "saturation"] as const).map(key => (
-            <AdjSlider
-              key={key}
-              label={key}
-              value={adj[key]}
-              onChange={v => {
-                const n = { ...adj, [key]: v };
-                setAdj(n);
-                applyFilters(n, activePreset);
-              }}
-            />
-          ))}
-          <button
-            onClick={() => { const z={brightness:0,contrast:0,saturation:0}; setAdj(z); applyFilters(z,activePreset); }}
-            className="text-[10px] text-white/30 hover:text-white/60 transition-colors"
-          >
-            Reset adjustments
-          </button>
-        </div>
-      );
-    }
-
-    if (activeTab === "filters") {
-      return (
-        <div className="flex gap-2 py-3 px-4 overflow-x-auto">
-          {PRESETS.map(p => (
-            <button
-              key={p.id}
-              onClick={() => { setActivePreset(p.id); applyFilters(adj, p.id); }}
-              className={`shrink-0 px-4 py-2 rounded-sm text-[10px] tracking-widest uppercase font-bold transition-all border ${
-                activePreset === p.id
-                  ? "bg-[#FF8A00] text-black border-[#FF8A00]"
-                  : "border-white/10 text-white/50 hover:text-white hover:border-white/20"
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      );
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-[300] flex flex-col" style={{ background: "#0c0c0c" }}>
       {/* Header */}
@@ -245,7 +124,7 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
           <div className="w-px h-4" style={{ background: "rgba(255,255,255,0.1)" }} />
           <div className="flex items-center gap-2">
             <Move className="w-3.5 h-3.5 text-[#FF8A00]" />
-            <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-white/60">Edit & Position</span>
+            <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-white/60">Position</span>
           </div>
         </div>
         <button
@@ -261,7 +140,7 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
       <div ref={containerRef} className="flex-1 relative overflow-hidden" style={{ background: "#141414", minHeight: 0 }}>
         <canvas ref={canvasElRef} className="absolute inset-0" />
 
-        {/* Crystal PNG overlay      non-interactive, sits on top of photo */}
+        {/* Crystal PNG overlay — non-interactive, sits on top of photo */}
         <img
           src={shape.crystalFramePng}
           alt=""
@@ -283,31 +162,20 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
         </div>
       </div>
 
-      {/* Tab bar + content */}
+      {/* Position controls */}
       <div className="shrink-0" style={{ background: "#0e0e0e", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-        {/* Tabs */}
-        <div className="flex" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="flex items-center justify-center gap-2 py-3 px-4 flex-wrap">
           {([
-            { id: "position", label: "Position", Icon: Move     },
-            { id: "adjust",   label: "Adjust",   Icon: Sliders  },
-            { id: "filters",  label: "Filters",  Icon: Sparkles },
-          ] as const).map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] tracking-widest uppercase font-bold transition-colors ${
-                activeTab === id
-                  ? "text-[#FF8A00] border-b-2 border-[#FF8A00]"
-                  : "text-white/30 hover:text-white/50"
-              }`}
-            >
-              <Icon className="w-3 h-3" /> {label}
+            { label: "Zoom Out",   Icon: ZoomOut,    action: () => zoomImg(-1) },
+            { label: "Center",     Icon: Move,       action: centerImage },
+            { label: "Rotate 90°", Icon: RotateIcon, action: rotateImg },
+            { label: "Zoom In",    Icon: ZoomIn,     action: () => zoomImg(1) },
+          ] as const).map(({ label, Icon, action }) => (
+            <button key={label} onClick={action} className="flex items-center gap-1.5 px-4 py-2 rounded-sm border border-white/10 text-white/50 hover:text-white hover:border-white/20 text-[11px] transition-all">
+              <Icon className="w-3.5 h-3.5" /> {label}
             </button>
           ))}
         </div>
-
-        {/* Tab content */}
-        {renderTabContent()}
       </div>
     </div>
   );
