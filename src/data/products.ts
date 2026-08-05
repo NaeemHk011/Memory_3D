@@ -9,6 +9,8 @@ import crystalHeart       from "@/assets/crystals/crystal-heart.png";
 import crystalIceberg     from "@/assets/crystals/crystal-iceberg.png";
 import crystalRectangle   from "@/assets/crystals/crystal-rectangle.png";
 import crystalSquare      from "@/assets/crystals/crystal-square.png";
+import crystalball      from "@/assets/crystals/crystalball.png";
+import crystaldogbone      from "@/assets/dog-bone-vertical-1.png";
 
 import c1 from "@/assets/3D_Crystals_1.avif";
 import c2 from "@/assets/3D_Crystals_2.avif";
@@ -17,10 +19,20 @@ import c4 from "@/assets/3D_Crystals_4.avif";
 import c5 from "@/assets/3D_Crystals_5.avif";
 import c6 from "@/assets/3D_Crystals_6.avif";
 
+// Images Added for Products
+import vk1 from "@/assets/Vertical Crystal Keychain.jpg";
+import urn1 from "@/assets/Memorial Urn Crystal.jpg";
+import dbh from "@/assets/3D_Crystals_3.avif";
+import rw1 from "@/assets/Wide Rectangle Crystal.jpg";
+import dc from "@/assets/Diamond Cut Crystal.webp";
+import hk1 from "@/assets/Horizontal Crystal Keychain.webp";
+import hk2 from "@/assets/Landscape Keychain Crystal.jpg";
+import nt1 from "@/assets/Notched Tall Crystal.avif";
+import ob1 from "@/assets/Optical Ball Crystal.webp";
 
 import pHeart  from "@/assets/product-rotating-heart.webp";
 import pSilver from "@/assets/product-lightbase-silver-heart.webp";
-import pKey    from "@/assets/product-keychain.webp";
+import pKey    from "@/assets/mini heart keychain.jpg";
 import pWood   from "@/assets/product-wooden-premium.webp";
 import incBg   from "@/assets/include-bg.webp";
 import heartKey1       from "@/assets/heart-keychain-1.webp";
@@ -66,11 +78,11 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalRectangle,
     crystalAspect: 0.68,
     products: [
-      { id: "rt-1", name: "Classic Portrait Crystal",  image: c1, badge: "Most Popular" },
-      { id: "rt-2", name: "Family Memory Crystal",     image: c1 },
-      { id: "rt-3", name: "Couple's Keepsake Crystal", image: c1 },
-      { id: "rt-4", name: "Individual Portrait Crystal", image: c1 },
-      { id: "rt-5", name: "Premium Portrait Crystal",  image: c1 },
+      { id: "c1", name: "Classic Portrait Crystal",  image: c1, badge: "Most Popular" },
+      { id: "c6", name: "Family Memory Crystal",     image: c6 },
+      // { id: "rt-3", name: "Couple's Keepsake Crystal", image: c1 },
+      // { id: "rt-4", name: "Individual Portrait Crystal", image: c1 },
+      // { id: "rt-5", name: "Premium Portrait Crystal",  image: c1 },
     ],
     sizes: [
       { id: "medium",            label: "Medium",            people: "1-2",  dimensions: "3x2x2 / 8x5x5cm",      price: 100 },
@@ -91,10 +103,10 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalGemRectangle,
     crystalAspect: 0.68,
     products: [
-      { id: "rw-1", name: "Wide Rectangle Crystal",   image: c2, badge: "Bestseller" },
-      { id: "rw-2", name: "Landscape Memory Crystal", image: c2 },
-      { id: "rw-3", name: "Family Panorama Crystal",  image: c2 },
-      { id: "rw-4", name: "Wide Format Crystal",      image: c2 },
+      { id: "rw-1", name: "Wide Rectangle Crystal",   image: rw1, badge: "Bestseller" },
+      // { id: "rw-2", name: "Landscape Memory Crystal", image: c2 },
+      // { id: "rw-3", name: "Family Panorama Crystal",  image: c2 },
+      // { id: "rw-4", name: "Wide Format Crystal",      image: c2 },
     ],
     sizes: [
       { id: "medium",             label: "Medium",             people: "1-2",  dimensions: "3x2x2 / 8x5x5cm",       price: 100 },
@@ -118,8 +130,8 @@ export const shapes: Shape[] = [
     products: [
       { id: "h-1", name: "Wedding Heart Crystal",  image: pHeart,  badge: "Top Gift" },
       { id: "h-2", name: "Heart with Silver Base", image: pSilver },
-      { id: "h-3", name: "Romantic Heart Gift",    image: pHeart },
-      { id: "h-4", name: "Heart Anniversary Crystal", image: pSilver },
+      // { id: "h-3", name: "Romantic Heart Gift",    image: pHeart },
+      // { id: "h-4", name: "Heart Anniversary Crystal", image: pSilver },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1-2", dimensions: "3.2x2.8x1.6 / 8x7x4cm",  price: 89  },
@@ -138,8 +150,8 @@ export const shapes: Shape[] = [
     crystalAspect: 1.0,
     products: [
       { id: "pr-1", name: "Prestige Beveled Crystal", image: c4,   badge: "Premium" },
-      { id: "pr-2", name: "Prestige with Wood Base",  image: pWood },
-      { id: "pr-3", name: "Prestige Crystal Gift Set", image: c4 },
+      // { id: "pr-2", name: "Prestige with Wood Base",  image: pWood },
+      // { id: "pr-3", name: "Prestige Crystal Gift Set", image: c4 },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1-2", dimensions: "5x4.3x2.4 / 13x11x6cm",   price: 225 },
@@ -152,12 +164,12 @@ export const shapes: Shape[] = [
   {
     id: "ball",
     label: "Ball",
-    thumbImage: crystalDiamond,
+    thumbImage: crystalball,
     previewImage: c6,
-    crystalFramePng: crystalDiamond,
+    crystalFramePng: crystalball,
     crystalAspect: 1.0,
     products: [
-      { id: "bl-1", name: "Optical Ball Crystal", image: c6 },
+      { id: "bl-1", name: "Optical Ball Crystal", image: ob1 },
     ],
     sizes: [
       { id: "small", label: "Small", people: "1", dimensions: "8cm", price: 155 },
@@ -173,7 +185,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalDiamond,
     crystalAspect: 1.0,
     products: [
-      { id: "cd-1", name: "Diamond Cut Crystal", image: c3, badge: "Great Value" },
+      { id: "cd-1", name: "Diamond Cut Crystal", image: dc, badge: "Great Value" },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1",   dimensions: "2x2x2 / 5x5x5cm",      price: 65  },
@@ -191,7 +203,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalRectangle,
     crystalAspect: 0.68,
     products: [
-      { id: "vk-1", name: "Vertical Crystal Keychain", image: pKey,   badge: "Gift Idea" },
+      { id: "vk-1", name: "Vertical Crystal Keychain", image: vk1,   badge: "Gift Idea" },
       { id: "vk-2", name: "Mini Portrait Keychain",    image: heartKey1 },
     ],
     sizes: [
@@ -208,8 +220,8 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalGemRectangle,
     crystalAspect: 0.68,
     products: [
-      { id: "hk-1", name: "Horizontal Crystal Keychain", image: pKey      },
-      { id: "hk-2", name: "Landscape Keychain Crystal",  image: heartKey1 },
+      { id: "hk-1", name: "Horizontal Crystal Keychain", image: hk1      },
+      { id: "hk-2", name: "Landscape Keychain Crystal",  image: hk2 },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "1.2x0.8x0.6 / 3x2x1.5cm", price: 40 },
@@ -275,7 +287,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalIceberg,
     crystalAspect: 0.73,
     products: [
-      { id: "ca-1", name: "Candle Crystal", image: c6 },
+      { id: "ca-1", name: "Candle Crystal", image: urn1 },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "4x2.4x2.4 / 10x6x6cm", price: 170 },
@@ -291,7 +303,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalIceberg,
     crystalAspect: 0.73,
     products: [
-      { id: "ur-1", name: "Memorial Urn Crystal", image: c4 },
+      { id: "ur-1", name: "Memorial Urn Crystal", image: urn1 },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-6", dimensions: "6x5x2.5 / 15x12x6cm", price: 195 },
@@ -307,7 +319,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalRectangle,
     crystalAspect: 0.68,
     products: [
-      { id: "nt-1", name: "Notched Tall Crystal", image: c1 },
+      { id: "nt-1", name: "Notched Tall Crystal", image: nt1 },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1-4", dimensions: "6x4 / 15x10cm", price: 200 },
@@ -341,7 +353,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalIceberg,
     crystalAspect: 0.73,
     products: [
-      { id: "dbv-1", name: "Dog Bone Crystal (Vertical)", image: c1 },
+      { id: "dbv-1", name: "Dog Bone Crystal (Vertical)", image: dbh },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "6x4 / 15x10cm", price: 205 },
@@ -352,12 +364,12 @@ export const shapes: Shape[] = [
   {
     id: "dog-bone-horizontal",
     label: "Dog Bone Horizontal",
-    thumbImage: crystalGemRectangle,
+    thumbImage: crystaldogbone,
     previewImage: c2,
-    crystalFramePng: crystalGemRectangle,
+    crystalFramePng: crystaldogbone,
     crystalAspect: 0.68,
     products: [
-      { id: "dbh-1", name: "Dog Bone Crystal (Horizontal)", image: c2 },
+      { id: "dbh-1", name: "Dog Bone Crystal (Horizontal)", image: dbh },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "6x4 / 15x10cm", price: 205 },
