@@ -8,7 +8,6 @@ import { CustomerForm }    from "@/components/shop/CustomerForm";
 import { TotalBar }        from "@/components/shop/TotalBar";
 import { calculateTotal }  from "@/components/shop/PriceCalculator";
 import { LivePreviewPanel } from "@/components/shop/LivePreviewPanel";
-import { ImageEditor }     from "@/components/shop/ImageEditor";
 import { ImagePositioner } from "@/components/shop/ImagePositioner";
 import { StepWizard }      from "@/components/shop/StepWizard";
 import { Reveal }          from "@/components/site/Reveal";
@@ -16,7 +15,7 @@ import { useCart }         from "@/hooks/use-cart";
 import { toast }           from "sonner";
 import {
   ArrowLeft, ArrowRight, ShoppingCart,
-  Pencil, Move, CheckCircle2, ImageIcon,
+  Move, CheckCircle2, ImageIcon,
 } from "lucide-react";
 
 interface ConfiguratorProps {
@@ -73,7 +72,6 @@ export function Configurator({ shape }: ConfiguratorProps) {
   const [inscriptionText, setInscriptionText] = useState("");
   const [shippingPrice,   setShippingPrice]   = useState(0);
   const [formData,        setFormData]        = useState<any>({});
-  const [showEditor,      setShowEditor]      = useState(false);
   const [showPositioner,  setShowPositioner]  = useState(false);
   const [currentStep,     setCurrentStep]     = useState(1);
 
@@ -107,11 +105,6 @@ export function Configurator({ shape }: ConfiguratorProps) {
   const handlePhotoChange = (file: File | null) => {
     setUploadedFile(file);
     setPhotoUrl(file ? URL.createObjectURL(file) : null);
-  };
-
-  const handleEditorSave = (base64: string) => {
-    setPhotoUrl(base64);
-    setShowEditor(false);
   };
 
   const handlePositionerSave = (base64: string) => {
@@ -207,46 +200,28 @@ export function Configurator({ shape }: ConfiguratorProps) {
                 <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground font-bold">
                   Customise Your Photo
                 </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setShowEditor(true)}
-                    className="group flex flex-col items-start gap-2 p-4 rounded-xl border border-border hover:border-gold/50 hover:bg-gold/5 transition-all text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-card border border-border flex items-center justify-center">
-                        <Pencil className="w-3.5 h-3.5 text-gold" />
-                      </div>
-                      <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-foreground">
-                        Edit & Filter
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">
-                      Adjust brightness, contrast, apply filters or add text overlay
-                    </p>
-                  </button>
 
-                  <button
-                    onClick={() => setShowPositioner(true)}
-                    className="group flex flex-col items-start gap-2 p-4 rounded-xl border border-gold/40 bg-gold/5 hover:bg-gold/10 transition-all text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-gold/20 flex items-center justify-center">
-                        <Move className="w-3.5 h-3.5 text-gold" />
-                      </div>
-                      <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-gold">
-                        Position
-                      </span>
+                <button
+                  onClick={() => setShowPositioner(true)}
+                  className="group flex flex-col items-start gap-2 p-4 rounded-xl border border-gold/40 bg-gold/5 hover:bg-gold/10 transition-all text-left w-full"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-gold/20 flex items-center justify-center">
+                      <Move className="w-3.5 h-3.5 text-gold" />
                     </div>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">
-                      Drag & zoom to perfectly frame your photo in the crystal shape
-                    </p>
-                  </button>
-                </div>
+                    <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-gold">
+                      Position
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    Drag & zoom to perfectly frame your photo in the crystal shape
+                  </p>
+                </button>
 
                 <div className="flex items-center gap-2 p-3 bg-card border border-border rounded-xl">
                   <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                   <p className="text-[10px] text-muted-foreground">
-                    Photo uploaded     both steps above are optional. Click <strong>Next</strong> when ready.
+                    Photo uploaded — positioning is optional. Click <strong>Next</strong> when ready.
                   </p>
                 </div>
               </div>
@@ -321,16 +296,10 @@ export function Configurator({ shape }: ConfiguratorProps) {
                       className="shrink-0 w-24 relative overflow-hidden"
                       style={{ aspectRatio: `${shape.crystalAspect}` }}
                     >
-                      <img src={photoUrl} alt="Your photo" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={photoUrl} alt="Your photo" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(100%)" }} />
                       <img src={shape.crystalFramePng} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 2 }} />
                     </div>
                     <div className="space-y-1.5">
-                      <button
-                        onClick={() => { setShowEditor(true); setCurrentStep(2); }}
-                        className="flex items-center gap-1.5 text-[10px] tracking-[0.1em] uppercase text-muted-foreground hover:text-gold transition-colors"
-                      >
-                        <Pencil className="w-3 h-3" /> Edit Photo
-                      </button>
                       <button
                         onClick={() => { setShowPositioner(true); setCurrentStep(2); }}
                         className="flex items-center gap-1.5 text-[10px] tracking-[0.1em] uppercase text-muted-foreground hover:text-gold transition-colors"
@@ -423,7 +392,7 @@ export function Configurator({ shape }: ConfiguratorProps) {
         >
           {photoUrl ? (
             <>
-              <img src={photoUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+              <img src={photoUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(100%)" }} />
               <img src={shape.crystalFramePng} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" style={{ zIndex: 2 }} />
             </>
           ) : (
@@ -453,7 +422,6 @@ export function Configurator({ shape }: ConfiguratorProps) {
                 size={selectedSize}
                 photoUrl={photoUrl}
                 totalPrice={totals.total}
-                onEditClick={() => setShowEditor(true)}
                 onPositionClick={() => setShowPositioner(true)}
               />
             </div>
@@ -516,13 +484,6 @@ export function Configurator({ shape }: ConfiguratorProps) {
       </div>
 
       {/* Modals */}
-      {showEditor && photoUrl && (
-        <ImageEditor
-          imageUrl={photoUrl}
-          onClose={() => setShowEditor(false)}
-          onSave={handleEditorSave}
-        />
-      )}
       {showPositioner && photoUrl && (
         <ImagePositioner
           imageUrl={photoUrl}
