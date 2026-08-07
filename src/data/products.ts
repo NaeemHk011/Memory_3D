@@ -1,5 +1,4 @@
 // /src/data/products.ts
-import deskLampImg from "@/assets/desk-lamp.png";
 
 // Crystal PNG frames (transparent background)
 import crystalDiamond     from "@/assets/crystals/crystal-diamond.png";
@@ -10,7 +9,11 @@ import crystalIceberg     from "@/assets/crystals/crystal-iceberg.png";
 import crystalRectangle   from "@/assets/crystals/crystal-rectangle.png";
 import crystalSquare      from "@/assets/crystals/crystal-square.png";
 import crystalball      from "@/assets/crystals/crystalball.png";
-import crystaldogbone      from "@/assets/dog-bone-vertical-1.png";
+import crystaldogbonehorizontal     from "@/assets/crystals/dog-bone-horizontal.png";
+import crystaldogbonevertical      from "@/assets/crystals/dog-bone-vertical-1.png";
+import CrystalDeskLamps from "@/assets/crystals/desk-lamp.png";
+import NotchedWide from "@/assets/crystals/notched wide crystal.png";
+import horizontalKeychain from "@/assets/crystals/keychain-horizontal.png";
 
 import c1 from "@/assets/3D_Crystals_1.avif";
 import c2 from "@/assets/3D_Crystals_2.avif";
@@ -29,13 +32,21 @@ import hk1 from "@/assets/Horizontal Crystal Keychain.webp";
 import hk2 from "@/assets/Landscape Keychain Crystal.jpg";
 import nt1 from "@/assets/Notched Tall Crystal.avif";
 import ob1 from "@/assets/Optical Ball Crystal.webp";
+import SilverHeartNecklace from "@/assets/Silver Heart Necklace.webp";
+import HeartNecklacePendant from "@/assets/Heart Necklace Pendant.jpg";
+import DogBoneCrystalHorizontal from "@/assets/Dog Bone Crystal horizontal.png";
+import CrystalDeskLamp from "@/assets/Crystal Desk Lamp.webp";
+import MiniPortraitKeychain from "@/assets/Mini Portrait Key chain.webp";
+import HeartCrystalKeychain from "@/assets/Heart Crystal Keychain.webp";
+import CandleCrystal from "@/assets/Candle Crystal.png";
+import NotchedWideCrystal from "@/assets/Notched Wide Crystal.jpg";
+
 
 import pHeart  from "@/assets/product-rotating-heart.webp";
 import pSilver from "@/assets/product-lightbase-silver-heart.webp";
 import pKey    from "@/assets/mini heart keychain.jpg";
 import pWood   from "@/assets/product-wooden-premium.webp";
 import incBg   from "@/assets/include-bg.webp";
-import heartKey1       from "@/assets/heart-keychain-1.webp";
 import ornamentStandImg from "@/assets/ornament-stand.png";
 
 /* ─────────────────────────────── types ─────────────────────────────── */
@@ -98,9 +109,9 @@ export const shapes: Shape[] = [
   {
     id: "rectangle-wide",
     label: "Rectangle Wide",
-    thumbImage: crystalGemRectangle,
+    thumbImage: NotchedWide,
     previewImage: c2,
-    crystalFramePng: crystalGemRectangle,
+    crystalFramePng: NotchedWide,
     crystalAspect: 0.68,
     products: [
       { id: "rw-1", name: "Wide Rectangle Crystal",   image: rw1, badge: "Bestseller" },
@@ -204,7 +215,7 @@ export const shapes: Shape[] = [
     crystalAspect: 0.68,
     products: [
       { id: "vk-1", name: "Vertical Crystal Keychain", image: vk1,   badge: "Gift Idea" },
-      { id: "vk-2", name: "Mini Portrait Keychain",    image: heartKey1 },
+      { id: "vk-2", name: "Mini Portrait Keychain",    image: MiniPortraitKeychain },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "1.2x0.8x0.6 / 3x2x1.5cm", price: 40 },
@@ -215,9 +226,9 @@ export const shapes: Shape[] = [
   {
     id: "horizontal-keychain",
     label: "Horizontal Keychain",
-    thumbImage: crystalGemRectangle,
+    thumbImage: horizontalKeychain,
     previewImage: pKey,
-    crystalFramePng: crystalGemRectangle,
+    crystalFramePng: horizontalKeychain,
     crystalAspect: 0.68,
     products: [
       { id: "hk-1", name: "Horizontal Crystal Keychain", image: hk1      },
@@ -233,11 +244,11 @@ export const shapes: Shape[] = [
     id: "heart-keychain",
     label: "Heart Keychain",
     thumbImage: crystalGemHeart,
-    previewImage: heartKey1,
+    previewImage: HeartCrystalKeychain,
     crystalFramePng: crystalGemHeart,
     crystalAspect: 1.0,
     products: [
-      { id: "hck-1", name: "Heart Crystal Keychain", image: heartKey1, badge: "Gift Idea" },
+      { id: "hck-1", name: "Heart Crystal Keychain", image: HeartCrystalKeychain, badge: "Gift Idea" },
       { id: "hck-2", name: "Mini Heart Keychain",    image: pKey },
     ],
     sizes: [
@@ -254,8 +265,8 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalGemHeart,
     crystalAspect: 1.0,
     products: [
-      { id: "hn-1", name: "Heart Necklace Pendant",  image: heartKey1 },
-      { id: "hn-2", name: "Silver Heart Necklace",   image: pSilver },
+      { id: "hn-1", name: "Heart Necklace Pendant",  image: HeartNecklacePendant },
+      { id: "hn-2", name: "Silver Heart Necklace",   image: SilverHeartNecklace },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "1.4x1.4x0.3 / 3.5x3.5x0.8cm", price: 55 },
@@ -287,7 +298,7 @@ export const shapes: Shape[] = [
     crystalFramePng: crystalIceberg,
     crystalAspect: 0.73,
     products: [
-      { id: "ca-1", name: "Candle Crystal", image: urn1 },
+      { id: "ca-1", name: "Candle Crystal", image: CandleCrystal },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "4x2.4x2.4 / 10x6x6cm", price: 170 },
@@ -331,12 +342,12 @@ export const shapes: Shape[] = [
   {
     id: "notched-wide",
     label: "Notched Wide",
-    thumbImage: crystalGemRectangle,
+    thumbImage: NotchedWide,
     previewImage: c2,
-    crystalFramePng: crystalGemRectangle,
+    crystalFramePng: NotchedWide,
     crystalAspect: 0.68,
     products: [
-      { id: "nw-1", name: "Notched Wide Crystal",  image: c2 },
+      { id: "nw-1", name: "Notched Wide Crystal",  image: NotchedWideCrystal },
     ],
     sizes: [
       { id: "small",  label: "Small",  people: "1-4", dimensions: "6x5 / 15x10cm", price: 200 },
@@ -348,9 +359,9 @@ export const shapes: Shape[] = [
   {
     id: "dog-bone-vertical",
     label: "Dog Bone Vertical",
-    thumbImage: crystalIceberg,
+    thumbImage: crystaldogbonevertical,
     previewImage: c1,
-    crystalFramePng: crystalIceberg,
+    crystalFramePng: crystaldogbonevertical,
     crystalAspect: 0.73,
     products: [
       { id: "dbv-1", name: "Dog Bone Crystal (Vertical)", image: dbh },
@@ -364,12 +375,12 @@ export const shapes: Shape[] = [
   {
     id: "dog-bone-horizontal",
     label: "Dog Bone Horizontal",
-    thumbImage: crystaldogbone,
+    thumbImage: crystaldogbonehorizontal,
     previewImage: c2,
-    crystalFramePng: crystaldogbone,
+    crystalFramePng: crystaldogbonehorizontal,
     crystalAspect: 0.68,
     products: [
-      { id: "dbh-1", name: "Dog Bone Crystal (Horizontal)", image: dbh },
+      { id: "dbh-1", name: "Dog Bone Crystal (Horizontal)", image: DogBoneCrystalHorizontal },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "6x4 / 15x10cm", price: 205 },
@@ -380,12 +391,12 @@ export const shapes: Shape[] = [
   {
     id: "desk-lamp",
     label: "Desk Lamp",
-    thumbImage: crystalRectangle,
-    previewImage: deskLampImg,
-    crystalFramePng: crystalRectangle,
+    thumbImage: CrystalDeskLamps,
+    previewImage: CrystalDeskLamp,
+    crystalFramePng: CrystalDeskLamps,
     crystalAspect: 0.68,
     products: [
-      { id: "dl-1", name: "Crystal Desk Lamp", image: pWood },
+      { id: "dl-1", name: "Crystal Desk Lamp", image: CrystalDeskLamp },
     ],
     sizes: [
       { id: "one-size", label: "One Size", people: "1-4", dimensions: "9.4x4.5 / 24x11cm", price: 250 },
@@ -405,7 +416,7 @@ export type Addon = {
 
 export const addons: Addon[] = [
   { id: "include-bg",          label: "Include Background That's in Original Photo", image: incBg,            price: 20, hasQty: false },
-  { id: "heart-keychain",      label: "Add Heart Keychain",                          image: heartKey1,        price: 25, hasQty: true  },
+  { id: "heart-keychain",      label: "Add Heart Keychain",                          image: HeartCrystalKeychain, price: 25, hasQty: true  },
   { id: "rectangle-keychain",  label: "Add Rectangle Keychain",                     image: pKey,             price: 25, hasQty: true  },
   { id: "ornament-stand",      label: "Ornament Stand",                             image: ornamentStandImg, price: 25, hasQty: true  },
   { id: "concave-lightbase",   label: "Concave Lightbase",                          image: pSilver,          price: 28, hasQty: true  },
