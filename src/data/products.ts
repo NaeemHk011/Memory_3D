@@ -12,7 +12,7 @@ import crystalball      from "@/assets/crystals/crystalball.png";
 import crystaldogbonehorizontal     from "@/assets/crystals/dog-bone-horizontal.png";
 import crystaldogbonevertical      from "@/assets/crystals/dog-bone-vertical-1.png";
 import CrystalDeskLamps from "@/assets/crystals/desk-lamp.png";
-import NotchedWide from "@/assets/crystals/notched wide crystal.png";
+import NotchedWide from "@/assets/crystals/Notched Wide Crystal.png";
 import horizontalKeychain from "@/assets/crystals/keychain-horizontal.png";
 
 import c1 from "@/assets/3D_Crystals_1.avif";
