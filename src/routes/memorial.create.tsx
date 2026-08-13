@@ -1,8 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { createMemorial } from "@/lib/memorial-api";
-import { getSupabase } from "@/lib/supabase";
+import { createMemorial, uploadPhoto } from "@/lib/memorial-api";
 import { Loader2, Upload, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/memorial/create")({
@@ -48,18 +47,19 @@ function CreateMemorialPage() {
       let coverUrl: string | undefined;
 
       if (coverFile) {
-        const ext = coverFile.name.split(".").pop();
-        const path = `covers/${crypto.randomUUID()}.${ext}`;
-        const { error: uploadErr } = await getSupabase().storage
-          .from("memorial-covers")
-          .upload(path, coverFile, { cacheControl: "3600" });
-
-        if (uploadErr) throw uploadErr;
-
-        const { data: { publicUrl } } = getSupabase().storage
-          .from("memorial-covers")
-          .getPublicUrl(path);
-        coverUrl = publicUrl;
+        const tmpMemorial = await createMemorial({
+          name: form.name.trim(),
+          birth_date: form.birth_date || undefined,
+          death_date: form.death_date || undefined,
+          bio: form.bio || undefined,
+          is_private: form.is_private,
+        });
+        const media = await uploadPhoto(tmpMemorial.id, coverFile);
+        await import("@/lib/memorial-api").then(({ updateMemorial }) =>
+          updateMemorial(tmpMemorial.id, { cover_photo: media.url })
+        );
+        navigate({ to: "/memorial/$slug", params: { slug: tmpMemorial.slug } });
+        return;
       }
 
       const memorial = await createMemorial({

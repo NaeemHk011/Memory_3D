@@ -28,7 +28,7 @@ function CheckoutPage() {
     setErrorMsg("");
     try {
       const firstPhoto = items.find((i) => i.photoBase64);
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/submit`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/ghl/submit.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -44,18 +44,19 @@ function CheckoutPage() {
           })),
           totalPrice,
           photoBase64: firstPhoto?.photoBase64 || null,
+          framedPhotoBase64: firstPhoto?.framedPhotoBase64 || null,
           photoName: firstPhoto?.photoName || null,
         }),
       });
 
       const text = await res.text();
-      if (!text) throw new Error("No response from server. Make sure vercel dev is running.");
+      if (!text) throw new Error("No response from server. Make sure XAMPP is running.");
 
       let data: any;
       try {
         data = JSON.parse(text);
       } catch {
-        throw new Error(`Server error (${res.status}). Check vercel dev terminal for details.`);
+        throw new Error(`Server error (${res.status}). Check PHP error logs for details.`);
       }
 
       if (!res.ok || data.error) throw new Error(data.error || "Order submission failed");

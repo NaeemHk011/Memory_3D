@@ -49,12 +49,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Try again
           </button>
-          <a
-            href="/"
+          <Link
+            to="/"
             className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-2.5 text-xs tracking-[0.2em] uppercase text-foreground hover:border-gold"
           >
             Go home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

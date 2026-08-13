@@ -196,7 +196,7 @@ function AcrylicConfigurator() {
       const photoBase64 = previewUrl?.startsWith("data:")
         ? previewUrl
         : uploadedFile ? await toBase64(uploadedFile) : null;
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/submit`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/ghl/submit.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

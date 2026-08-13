@@ -1,18 +1,5 @@
-import { getSupabase } from "./supabase";
+import { apiFetch, apiPost, apiUpload } from "./api-client";
 import type { Memorial, MemorialMedia, MemorialStory, MemorialDate, MemorialMember } from "@/types/memorial";
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 60);
-}
-
-function randomToken(): string {
-  return crypto.randomUUID().replace(/-/g, "");
-}
 
 // ── Memorials ──────────────────────────────────────────────
 
@@ -24,125 +11,83 @@ export async function createMemorial(data: {
   cover_photo?: string;
   is_private?: boolean;
 }): Promise<Memorial> {
-  const sb = getSupabase();
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const baseSlug = slugify(data.name);
-  const slug = `${baseSlug}-${Date.now().toString(36)}`;
-
-  const { data: memorial, error } = await sb
-    .from("memorials")
-    .insert({
-      ...data,
-      slug,
-      owner_id: user.id,
-      share_token: randomToken(),
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return memorial;
+  return apiPost<Memorial>("/memorials/create.php", data);
 }
 
 export async function getMemorialBySlug(slug: string): Promise<Memorial | null> {
-  const { data, error } = await getSupabase()
-    .from("memorials")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  if (error) return null;
-  return data;
+  try {
+    return await apiFetch<Memorial>(`/memorials/get.php?slug=${encodeURIComponent(slug)}`);
+  } catch {
+    return null;
+  }
 }
 
 export async function getMyMemorials(): Promise<Memorial[]> {
-  const sb = getSupabase();
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return [];
-
-  const { data, error } = await sb
-    .from("memorials")
-    .select("*")
-    .eq("owner_id", user.id)
-    .order("created_at", { ascending: false });
-
-  if (error) return [];
-  return data ?? [];
+  try {
+    return await apiFetch<Memorial[]>("/memorials/list.php");
+  } catch {
+    return [];
+  }
 }
 
 export async function updateMemorial(id: string, updates: Partial<Memorial>): Promise<Memorial> {
-  const { data, error } = await getSupabase()
-    .from("memorials")
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return apiPost<Memorial>("/memorials/update.php", { id, ...updates });
 }
 
 export async function deleteMemorial(id: string): Promise<void> {
-  const { error } = await getSupabase().from("memorials").delete().eq("id", id);
-  if (error) throw error;
+  await apiPost("/memorials/delete.php", { id });
 }
 
 // ── Media ──────────────────────────────────────────────────
+
+export async function uploadMemorialPhoto(
+  memorialId: string,
+  field: "cover_photo" | "profile_photo",
+  file: File
+): Promise<Memorial> {
+  const fd = new FormData();
+  fd.append("memorial_id", memorialId);
+  fd.append("file", file);
+  const media = await apiUpload<{ url: string }>("/media/upload.php", fd);
+  return apiPost<Memorial>("/memorials/update.php", { id: memorialId, [field]: media.url });
+}
 
 export async function uploadPhoto(
   memorialId: string,
   file: File,
   caption?: string
 ): Promise<MemorialMedia> {
-  const sb = getSupabase();
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const ext = file.name.split(".").pop();
-  const path = `${memorialId}/${crypto.randomUUID()}.${ext}`;
-
-  const { error: uploadError } = await sb.storage
-    .from("memorial-photos")
-    .upload(path, file, { cacheControl: "3600", upsert: false });
-
-  if (uploadError) throw uploadError;
-
-  const { data: { publicUrl } } = sb.storage
-    .from("memorial-photos")
-    .getPublicUrl(path);
-
-  const { data, error } = await sb
-    .from("memorial_media")
-    .insert({
-      memorial_id: memorialId,
-      uploader_id: user.id,
-      type: "photo",
-      url: publicUrl,
-      caption: caption ?? null,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  const fd = new FormData();
+  fd.append("memorial_id", memorialId);
+  fd.append("file", file);
+  if (caption) fd.append("caption", caption);
+  return apiUpload<MemorialMedia>("/media/upload.php", fd);
 }
 
 export async function getMemorialMedia(memorialId: string): Promise<MemorialMedia[]> {
-  const { data, error } = await getSupabase()
-    .from("memorial_media")
-    .select("*")
-    .eq("memorial_id", memorialId)
-    .order("uploaded_at", { ascending: true });
-
-  if (error) return [];
-  return data ?? [];
+  try {
+    return await apiFetch<MemorialMedia[]>(
+      `/media/list.php?memorial_id=${encodeURIComponent(memorialId)}`
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function deleteMedia(id: string): Promise<void> {
-  const { error } = await getSupabase().from("memorial_media").delete().eq("id", id);
-  if (error) throw error;
+  await apiPost("/media/delete.php", { id });
+}
+
+export async function addVideoLink(
+  memorialId: string,
+  url: string,
+  caption?: string
+): Promise<MemorialMedia> {
+  return apiPost<MemorialMedia>("/media/add-video.php", {
+    memorial_id: memorialId,
+    url,
+    caption: caption ?? null,
+  });
 }
 
 // ── Stories ────────────────────────────────────────────────
@@ -150,86 +95,56 @@ export async function deleteMedia(id: string): Promise<void> {
 export async function submitStory(data: {
   memorial_id: string;
   author_name: string;
-  title: string;
+  relationship?: string;
   content: string;
 }): Promise<MemorialStory> {
-  const sb = getSupabase();
-  const { data: { user } } = await sb.auth.getUser();
-
-  const { data: story, error } = await sb
-    .from("memorial_stories")
-    .insert({
-      ...data,
-      author_id: user?.id ?? null,
-      is_approved: true,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return story;
+  return apiPost<MemorialStory>("/stories/submit.php", data);
 }
 
 export async function getStories(memorialId: string): Promise<MemorialStory[]> {
-  const { data, error } = await getSupabase()
-    .from("memorial_stories")
-    .select("*")
-    .eq("memorial_id", memorialId)
-    .eq("is_approved", true)
-    .order("created_at", { ascending: false });
-
-  if (error) return [];
-  return data ?? [];
+  try {
+    return await apiFetch<MemorialStory[]>(
+      `/stories/list.php?memorial_id=${encodeURIComponent(memorialId)}`
+    );
+  } catch {
+    return [];
+  }
 }
 
 // ── Dates ──────────────────────────────────────────────────
 
 export async function getMemorialDates(memorialId: string): Promise<MemorialDate[]> {
-  const { data, error } = await getSupabase()
-    .from("memorial_dates")
-    .select("*")
-    .eq("memorial_id", memorialId)
-    .order("date", { ascending: true });
-
-  if (error) return [];
-  return data ?? [];
+  try {
+    return await apiFetch<MemorialDate[]>(
+      `/dates/list.php?memorial_id=${encodeURIComponent(memorialId)}`
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function addMemorialDate(data: {
   memorial_id: string;
   label: string;
   date: string;
-  note?: string;
 }): Promise<MemorialDate> {
-  const { data: d, error } = await getSupabase()
-    .from("memorial_dates")
-    .insert(data)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return d;
+  return apiPost<MemorialDate>("/dates/add.php", data);
 }
 
-// ── Family Members ─────────────────────────────────────────
+export async function deleteMemorialDate(id: string): Promise<void> {
+  await apiPost("/dates/delete.php", { id });
+}
+
+// ── Family Members (stubs — invite flow not yet in PHP backend) ──────
+
+export async function getMemorialMembers(_memorialId: string): Promise<MemorialMember[]> {
+  return [];
+}
 
 export async function inviteFamilyMember(
-  memorialId: string,
-  email: string,
-  role: "editor" | "viewer" = "viewer"
+  _memorialId: string,
+  _email: string,
+  _role: "editor" | "viewer" = "viewer"
 ): Promise<void> {
-  const { error } = await getSupabase().functions.invoke("invite-family", {
-    body: { memorial_id: memorialId, email, role },
-  });
-  if (error) throw error;
-}
-
-export async function getMemorialMembers(memorialId: string): Promise<MemorialMember[]> {
-  const { data, error } = await getSupabase()
-    .from("memorial_members")
-    .select("*")
-    .eq("memorial_id", memorialId);
-
-  if (error) return [];
-  return data ?? [];
+  throw new Error("Family invite is not yet available.");
 }

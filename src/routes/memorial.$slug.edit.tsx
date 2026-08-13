@@ -5,12 +5,11 @@ import {
   getMemorialBySlug,
   updateMemorial,
   deleteMemorial,
-  getMemorialMembers,
+  uploadPhoto,
 } from "@/lib/memorial-api";
 import { FamilyInvite } from "@/components/memorial/FamilyInvite";
 import type { Memorial } from "@/types/memorial";
 import { Loader2, ArrowLeft, Trash2, Upload } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/memorial/$slug/edit")({
   component: EditMemorialPage,
@@ -82,16 +81,8 @@ function EditMemorialPage() {
       let coverUrl = memorial.cover_photo;
 
       if (coverFile) {
-        const ext = coverFile.name.split(".").pop();
-        const path = `covers/${crypto.randomUUID()}.${ext}`;
-        const { error: uploadErr } = await getSupabase().storage
-          .from("memorial-covers")
-          .upload(path, coverFile, { cacheControl: "3600" });
-        if (uploadErr) throw uploadErr;
-        const { data: { publicUrl } } = getSupabase().storage
-          .from("memorial-covers")
-          .getPublicUrl(path);
-        coverUrl = publicUrl;
+        const media = await uploadPhoto(memorial.id, coverFile);
+        coverUrl = media.url;
       }
 
       await updateMemorial(memorial.id, {

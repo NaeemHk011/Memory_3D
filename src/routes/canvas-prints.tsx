@@ -175,7 +175,7 @@ function CanvasConfigurator() {
         ? previewUrl
         : uploadedFile ? await toBase64(uploadedFile) : null;
       const hanger = hangers.find((h) => h.id === selectedHanger);
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/submit`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/ghl/submit.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -8,12 +8,13 @@ import crystalHeart       from "@/assets/crystals/crystal-heart.png";
 import crystalIceberg     from "@/assets/crystals/crystal-iceberg.png";
 import crystalRectangle   from "@/assets/crystals/crystal-rectangle.png";
 import crystalSquare      from "@/assets/crystals/crystal-square.png";
-import crystalball      from "@/assets/crystals/crystalball.png";
-import crystaldogbonehorizontal     from "@/assets/crystals/dog-bone-horizontal.png";
-import crystaldogbonevertical      from "@/assets/crystals/dog-bone-vertical-1.png";
-import CrystalDeskLamps from "@/assets/crystals/desk-lamp.png";
+import crystalball      from "@/assets/crystals/ball-new.png";
+import crystaldogbonehorizontal     from "@/assets/crystals/dog-bone-horizontal-new.png";
+import crystaldogbonevertical      from "@/assets/crystals/dog-bone-vertical-new.png";
+import CrystalDeskLamps from "@/assets/crystals/desk-lamp-new.png";
 import NotchedWide from "@/assets/crystals/Notched Wide Crystal.png";
-import horizontalKeychain from "@/assets/crystals/keychain-horizontal.png";
+import horizontalKeychain from "@/assets/crystals/keychain-horizontal-new.png";
+
 
 import c1 from "@/assets/3D_Crystals_1.avif";
 import c2 from "@/assets/3D_Crystals_2.avif";
@@ -178,7 +179,7 @@ export const shapes: Shape[] = [
     thumbImage: crystalball,
     previewImage: c6,
     crystalFramePng: crystalball,
-    crystalAspect: 1.0,
+    crystalAspect: 1.0, // square PNG
     products: [
       { id: "bl-1", name: "Optical Ball Crystal", image: ob1 },
     ],
@@ -229,7 +230,7 @@ export const shapes: Shape[] = [
     thumbImage: horizontalKeychain,
     previewImage: pKey,
     crystalFramePng: horizontalKeychain,
-    crystalAspect: 0.68,
+    crystalAspect: 1.0,
     products: [
       { id: "hk-1", name: "Horizontal Crystal Keychain", image: hk1      },
       { id: "hk-2", name: "Landscape Keychain Crystal",  image: hk2 },
@@ -362,7 +363,7 @@ export const shapes: Shape[] = [
     thumbImage: crystaldogbonevertical,
     previewImage: c1,
     crystalFramePng: crystaldogbonevertical,
-    crystalAspect: 0.73,
+    crystalAspect: 1.0,
     products: [
       { id: "dbv-1", name: "Dog Bone Crystal (Vertical)", image: dbh },
     ],
@@ -378,7 +379,7 @@ export const shapes: Shape[] = [
     thumbImage: crystaldogbonehorizontal,
     previewImage: c2,
     crystalFramePng: crystaldogbonehorizontal,
-    crystalAspect: 0.68,
+    crystalAspect: 1.0,
     products: [
       { id: "dbh-1", name: "Dog Bone Crystal (Horizontal)", image: DogBoneCrystalHorizontal },
     ],
@@ -394,7 +395,7 @@ export const shapes: Shape[] = [
     thumbImage: CrystalDeskLamps,
     previewImage: CrystalDeskLamp,
     crystalFramePng: CrystalDeskLamps,
-    crystalAspect: 0.68,
+    crystalAspect: 1.0,
     products: [
       { id: "dl-1", name: "Crystal Desk Lamp", image: CrystalDeskLamp },
     ],

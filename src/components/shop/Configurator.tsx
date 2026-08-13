@@ -72,8 +72,10 @@ export function Configurator({ shape }: ConfiguratorProps) {
   const [inscriptionText, setInscriptionText] = useState("");
   const [shippingPrice,   setShippingPrice]   = useState(0);
   const [formData,        setFormData]        = useState<any>({});
-  const [showPositioner,  setShowPositioner]  = useState(false);
-  const [currentStep,     setCurrentStep]     = useState(1);
+  const [showPositioner,     setShowPositioner]     = useState(false);
+  const [currentStep,        setCurrentStep]        = useState(1);
+  const [originalPhotoBase64, setOriginalPhotoBase64] = useState<string | null>(null);
+  const [framedPhotoBase64,   setFramedPhotoBase64]   = useState<string | null>(null);
 
   useEffect(() => {
     setSelectedSize(shape.sizes[0]);
@@ -102,13 +104,26 @@ export function Configurator({ shape }: ConfiguratorProps) {
     5: false,
   };
 
-  const handlePhotoChange = (file: File | null) => {
+  const handlePhotoChange = async (file: File | null) => {
     setUploadedFile(file);
     setPhotoUrl(file ? URL.createObjectURL(file) : null);
+    setFramedPhotoBase64(null);
+    if (file) {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload  = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+      setOriginalPhotoBase64(base64);
+    } else {
+      setOriginalPhotoBase64(null);
+    }
   };
 
-  const handlePositionerSave = (base64: string) => {
-    setPhotoUrl(base64);
+  const handlePositionerSave = (positionedBase64: string, framedBase64: string) => {
+    setPhotoUrl(positionedBase64);
+    setFramedPhotoBase64(framedBase64);
     setShowPositioner(false);
   };
 
@@ -117,21 +132,7 @@ export function Configurator({ shape }: ConfiguratorProps) {
       name: formData.name || "", email: formData.email || "", phone: formData.phone || "",
     }));
 
-    let photoBase64: string | undefined;
-    let photoName: string | undefined;
-
-    if (photoUrl?.startsWith("data:")) {
-      photoBase64 = photoUrl;
-      photoName = uploadedFile?.name || "photo.jpg";
-    } else if (uploadedFile) {
-      photoName = uploadedFile.name;
-      photoBase64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(uploadedFile);
-        reader.onload  = () => resolve(reader.result as string);
-        reader.onerror = reject;
-      });
-    }
+    const photoName = uploadedFile?.name || "photo.jpg";
 
     try {
       addItem({
@@ -140,7 +141,9 @@ export function Configurator({ shape }: ConfiguratorProps) {
         sizeId: selectedSize.id, sizeLabel: selectedSize.label,
         price: totals.total,
         photo: photoUrl || "",
-        photoBase64, photoName,
+        photoBase64: originalPhotoBase64 || undefined,
+        framedPhotoBase64: framedPhotoBase64 || undefined,
+        photoName,
         addons: addons
           .filter((a) => selectedAddons[a.id]?.checked)
           .map((a) => ({ id: a.id, label: a.label, price: a.price, qty: selectedAddons[a.id]?.qty || 1 })),
@@ -152,7 +155,7 @@ export function Configurator({ shape }: ConfiguratorProps) {
     } catch {
       toast.error("Could not add to cart. Please try again.");
     }
-  }, [shape, selectedSize, uploadedFile, photoUrl, selectedAddons, inscriptionText, addItem, navigate, totals.total, formData]);
+  }, [shape, selectedSize, uploadedFile, photoUrl, originalPhotoBase64, framedPhotoBase64, selectedAddons, inscriptionText, addItem, navigate, totals.total, formData]);
 
   const description   = productDescriptions[shape.id] || "";
   const startingPrice = Math.min(...shape.sizes.map((s) => s.price));

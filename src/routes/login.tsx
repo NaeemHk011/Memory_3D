@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, Mail, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -9,10 +9,10 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const { signIn } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const navigate   = useNavigate();
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [status,   setStatus]   = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,69 +23,106 @@ function LoginPage() {
       await signIn(email, password);
       navigate({ to: "/dashboard" });
     } catch (err: any) {
-      setErrorMsg(err.message ?? "Login failed. Please try again.");
+      setErrorMsg(err.message ?? "Incorrect email or password.");
       setStatus("error");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Heart className="w-10 h-10 text-gold mx-auto mb-4" />
-          <h1 className="font-display text-4xl text-foreground">Welcome back</h1>
-          <p className="mt-2 text-muted-foreground text-sm">Sign in to manage your memorials</p>
+    <div className="min-h-screen flex" style={{ background: "#f5f3ef" }}>
+
+      {/* Left panel — branding */}
+      <div
+        className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 p-12"
+        style={{ background: "#1e2340" }}
+      >
+        <div className="flex items-center gap-3">
+          <Heart className="w-7 h-7" style={{ color: "#b8962e" }} />
+          <span className="text-white font-semibold text-lg">Memory3D Memorials</span>
         </div>
-
-        <form onSubmit={handleSubmit} className="bg-card border border-border rounded-sm p-8 space-y-5">
-          <div>
-            <label className="block text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-background border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-background border border-border rounded-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold transition-colors"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {status === "error" && (
-            <p className="text-red-400 text-sm">{errorMsg}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="w-full bg-gradient-gold text-primary-foreground py-3 rounded-sm text-[11px] tracking-[0.3em] uppercase font-medium disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {status === "loading" && <Loader2 className="w-4 h-4 animate-spin" />}
-            Sign In
-          </button>
-
-          <p className="text-center text-sm text-muted-foreground pt-2">
-            No account?{" "}
-            <Link to="/signup" className="text-gold hover:underline">
-              Create one
-            </Link>
+        <div>
+          <blockquote className="text-2xl font-light leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.85)" }}>
+            "Those we love don't go away, they walk beside us every day."
+          </blockquote>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Create and share lasting digital memorials for those who matter most.
           </p>
-        </form>
+        </div>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-md">
+
+          <div className="mb-8">
+            <Heart className="w-9 h-9 mb-4 lg:hidden" style={{ color: "#b8962e" }} />
+            <h1 className="text-3xl font-semibold" style={{ color: "#1a1a1a" }}>Welcome back</h1>
+            <p className="mt-1 text-sm" style={{ color: "#9d9590" }}>Sign in to manage your memorials</p>
+          </div>
+
+          <div className="rounded-2xl p-8 shadow-sm" style={{ background: "#fff", border: "1px solid #e9e5de" }}>
+            <form onSubmit={handleSubmit} className="space-y-5">
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: "#6b6560" }}>
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#b8b0a8" }} />
+                  <input
+                    type="email" required value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 text-sm rounded-lg outline-none transition-colors"
+                    style={{ background: "#faf9f7", border: "1px solid #e9e5de", color: "#1a1a1a" }}
+                    placeholder="you@example.com"
+                    onFocus={(e) => (e.target.style.borderColor = "#b8962e")}
+                    onBlur={(e) => (e.target.style.borderColor = "#e9e5de")}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: "#6b6560" }}>
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#b8b0a8" }} />
+                  <input
+                    type="password" required value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 text-sm rounded-lg outline-none transition-colors"
+                    style={{ background: "#faf9f7", border: "1px solid #e9e5de", color: "#1a1a1a" }}
+                    placeholder="••••••••"
+                    onFocus={(e) => (e.target.style.borderColor = "#b8962e")}
+                    onBlur={(e) => (e.target.style.borderColor = "#e9e5de")}
+                  />
+                </div>
+              </div>
+
+              {status === "error" && (
+                <p className="text-sm rounded-lg px-4 py-3" style={{ background: "#fff5f5", color: "#c0392b", border: "1px solid #fcc" }}>
+                  {errorMsg}
+                </p>
+              )}
+
+              <button
+                type="submit" disabled={status === "loading"}
+                className="w-full py-3 rounded-lg text-sm font-semibold text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-60"
+                style={{ background: "#1e2340" }}
+              >
+                {status === "loading" && <Loader2 className="w-4 h-4 animate-spin" />}
+                Sign In
+              </button>
+            </form>
+
+            <p className="text-center text-sm mt-5" style={{ color: "#9d9590" }}>
+              No account?{" "}
+              <Link to="/signup" className="font-semibold hover:underline" style={{ color: "#b8962e" }}>
+                Create one
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

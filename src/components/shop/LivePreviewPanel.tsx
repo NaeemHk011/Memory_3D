@@ -2,9 +2,9 @@ import { Star, Shield, Truck, RotateCcw, Move } from "lucide-react";
 import type { Shape, Size } from "@/data/products";
 
 const trustBadges = [
-  { icon: Shield, label: "Premium Optical Crystal" },
-  { icon: Star,   label: "4.9★ · 12k+ Reviews"     },
-  { icon: Truck,  label: "10–14 Day Delivery"       },
+  { icon: Shield,   label: "Premium Optical Crystal"  },
+  { icon: Star,     label: "4.9★ · 12k+ Reviews"      },
+  { icon: Truck,    label: "10–14 Day Delivery"        },
   { icon: RotateCcw, label: "Satisfaction Guaranteed" },
 ];
 
@@ -16,13 +16,12 @@ interface Props {
   onPositionClick: () => void;
 }
 
-export function LivePreviewPanel({
-  shape, size, photoUrl, totalPrice, onPositionClick,
-}: Props) {
+export function LivePreviewPanel({ shape, size, photoUrl, totalPrice, onPositionClick }: Props) {
   const paddingTop = `${(1 / shape.crystalAspect) * 100}%`;
 
   return (
     <div className="lg:sticky lg:top-28 space-y-6">
+
       {/* Live indicator */}
       <div className="flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-gold animate-pulse" />

@@ -44,7 +44,20 @@
       "Bash(cp \"3D crystal shapes-01.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-gem-heart.png\")",
       "Bash(cp \"3D crystal shapes-02.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-rectangle.png\")",
       "Bash(cp \"3D crystal shapes-03.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-square.png\")",
-      "Bash(cp \"3D crystal shapes-04.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-gem-rectangle.png\")"
+      "Bash(cp \"3D crystal shapes-04.png\" \"/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/crystal-gem-rectangle.png\")",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git push *)",
+      "Read(//c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/routes/**)",
+      "Read(//c/xampp/htdocs//**)",
+      "Read(//c/wamp/**)",
+      "Bash(tasklist)",
+      "Bash(cp '/c/Users/Administrator/Downloads/3D crystal shapes-12.png' '/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/keychain-horizontal-new.png')",
+      "Bash(cp '/c/Users/Administrator/Downloads/3D crystal shapes-10.png' '/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/dog-bone-vertical-new.png')",
+      "Bash(cp '/c/Users/Administrator/Downloads/3D crystal shapes-15.png' '/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/desk-lamp-new.png')",
+      "Bash(cp '/c/Users/Administrator/Downloads/3D crystal shapes-16.png' '/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/ball-new.png')",
+      "Bash(cp '/c/Users/Administrator/Downloads/3D crystal shapes-09.png' '/c/Users/Administrator/Desktop/TechGenics/Memory_3D/src/assets/crystals/dog-bone-horizontal-src.png')"
     ]
   }
 }

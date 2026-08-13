@@ -7,7 +7,7 @@ interface Props {
   imageUrl: string;
   shape: Shape;
   onClose: () => void;
-  onSave: (base64: string) => void;
+  onSave: (positionedBase64: string, framedBase64: string) => void;
 }
 
 interface GuideBounds { cx: number; cy: number; gw: number; gh: number; }
@@ -103,15 +103,37 @@ export function ImagePositioner({ imageUrl, shape, onClose, onSave }: Props) {
     img.rotate(((img.angle||0)+90)%360); c.renderAll();
   };
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     const c=fabricRef.current, b=guideBoundsRef.current; if(!c)return;
     const cropL=b?Math.max(0,Math.floor(b.cx-b.gw/2)):0, cropT=b?Math.max(0,Math.floor(b.cy-b.gh/2)):0;
     const cropW=b?Math.ceil(b.gw):c.getWidth(), cropH=b?Math.ceil(b.gh):c.getHeight();
     c.setBackgroundColor("#ffffff", ()=>{}); c.renderAll();
-    const dataUrl = c.toDataURL({ format:"jpeg", quality:0.95, multiplier:2, left:cropL, top:cropT, width:Math.max(1,cropW), height:Math.max(1,cropH) });
+    const positionedBase64 = c.toDataURL({ format:"jpeg", quality:0.95, multiplier:2, left:cropL, top:cropT, width:Math.max(1,cropW), height:Math.max(1,cropH) });
     c.setBackgroundColor("#141414", ()=>{}); c.renderAll();
-    onSave(dataUrl);
-  }, [onSave]);
+
+    // Generate framed composite: positioned photo + crystal frame PNG overlaid
+    const framedBase64 = await new Promise<string>((resolve) => {
+      const photoImg = new Image();
+      photoImg.onload = () => {
+        const W = photoImg.naturalWidth, H = photoImg.naturalHeight;
+        const cv = document.createElement("canvas");
+        cv.width = W; cv.height = H;
+        const ctx = cv.getContext("2d")!;
+        ctx.drawImage(photoImg, 0, 0, W, H);
+        const frameImg = new Image();
+        frameImg.onload = () => {
+          ctx.drawImage(frameImg, 0, 0, W, H);
+          resolve(cv.toDataURL("image/jpeg", 0.92));
+        };
+        frameImg.onerror = () => resolve(positionedBase64);
+        frameImg.src = shape.crystalFramePng;
+      };
+      photoImg.onerror = () => resolve(positionedBase64);
+      photoImg.src = positionedBase64;
+    });
+
+    onSave(positionedBase64, framedBase64);
+  }, [onSave, shape.crystalFramePng]);
 
   return (
     <div className="fixed inset-0 z-[300] flex flex-col" style={{ background: "#0c0c0c" }}>

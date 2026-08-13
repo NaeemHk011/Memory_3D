@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { ArrowRight, Phone } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ArrowRight, Phone, User, LayoutDashboard, Plus, LogOut, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/Memory_3D_Logo (1) (3).png";
+import { useAuth } from "@/hooks/use-auth";
 
 type NavItem = { label: string; to: string };
 
@@ -29,6 +30,9 @@ const mobileNav: NavItem[] = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -47,6 +51,16 @@ export function Header() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -95,6 +109,67 @@ export function Header() {
                 <ArrowRight className="w-2.5 h-2.5" />
               </span>
             </Link>
+
+            {/* ── Memorial / User button ── */}
+            {user ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition-all duration-200 text-[10px] tracking-[0.15em] uppercase font-semibold"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">My Memorials</span>
+                </button>
+
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-52 bg-[#111] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50"
+                    >
+                      <div className="px-4 py-2.5 border-b border-white/[0.07]">
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest">Signed in as</p>
+                        <p className="text-xs text-white/70 mt-0.5 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-gold/70" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/memorial/create"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <Plus className="w-4 h-4 text-gold/70" />
+                        Create Memorial
+                      </Link>
+                      <button
+                        onClick={() => { signOut(); setUserMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/50 hover:text-red-400 hover:bg-red-900/10 transition-colors border-t border-white/[0.07]"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-2 px-3 py-2 rounded-full border border-white/15 text-white/60 hover:text-white hover:border-white/30 transition-all duration-200 text-[10px] tracking-[0.15em] uppercase font-semibold"
+              >
+                <Heart className="w-3.5 h-3.5 text-gold/70" />
+                <span className="hidden md:inline">Memorials</span>
+              </Link>
+            )}
 
             {/* Hamburger */}
             <button
@@ -175,7 +250,7 @@ export function Header() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="mt-8"
+                className="mt-8 space-y-3"
               >
                 <Link
                   to="/shop"
@@ -187,6 +262,34 @@ export function Header() {
                     <ArrowRight className="w-3 h-3" />
                   </span>
                 </Link>
+
+                {user ? (
+                  <div className="flex gap-3">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-2 py-3.5 border border-gold/30 text-gold rounded-full text-[10px] tracking-[0.2em] uppercase font-semibold hover:bg-gold/10 transition-colors"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => { signOut(); setOpen(false); }}
+                      className="flex items-center justify-center gap-2 px-5 py-3.5 border border-white/15 text-white/50 rounded-full text-[10px] tracking-[0.2em] uppercase font-semibold hover:text-red-400 hover:border-red-900/40 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full py-3.5 border border-white/15 text-white/60 rounded-full text-[10px] tracking-[0.3em] uppercase font-semibold hover:text-white hover:border-white/30 transition-colors"
+                  >
+                    <Heart className="w-4 h-4 text-gold/70" />
+                    Memorial Platform — Sign In
+                  </Link>
+                )}
               </motion.div>
             </div>
 

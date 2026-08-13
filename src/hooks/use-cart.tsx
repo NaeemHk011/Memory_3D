@@ -9,6 +9,7 @@ export interface CartItem {
   price: number;
   photo: string;
   photoBase64?: string;
+  framedPhotoBase64?: string;
   photoName?: string;
   addons: Array<{ id: string; label: string; price: number; qty: number }>;
   inscriptionText: string;

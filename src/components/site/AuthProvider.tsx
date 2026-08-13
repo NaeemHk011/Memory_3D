@@ -1,10 +1,14 @@
 import React, { createContext, useEffect, useState } from "react";
-import type { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { apiFetch, apiPost, setToken, clearToken } from "@/lib/api-client";
+
+interface AuthUser {
+  id: string;
+  email: string;
+  created_at?: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -14,53 +18,41 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!supabase) { setLoading(false); return; }
-
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-      })
-      .catch(() => {})
+    apiFetch<{ user: AuthUser }>("/auth/me.php")
+      .then(({ user }) => setUser(user))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false));
-
-    let subscription: { unsubscribe: () => void } | null = null;
-    try {
-      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-      });
-      subscription = data.subscription;
-    } catch {}
-
-    return () => subscription?.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    if (!supabase) throw new Error("Auth not configured");
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) throw error;
+    const res = await apiPost<{ token: string; user: AuthUser }>("/auth/signup.php", {
+      email,
+      password,
+    });
+    setToken(res.token);
+    setUser(res.user);
   };
 
   const signIn = async (email: string, password: string) => {
-    if (!supabase) throw new Error("Auth not configured");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    const res = await apiPost<{ token: string; user: AuthUser }>("/auth/login.php", {
+      email,
+      password,
+    });
+    setToken(res.token);
+    setUser(res.user);
   };
 
   const signOut = async () => {
-    if (!supabase) return;
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    clearToken();
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

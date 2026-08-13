@@ -1,0 +1,22 @@
+Options -Indexes
+RewriteEngine On
+
+# Pass Authorization header to PHP
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Allow uploads folder
+RewriteCond %{REQUEST_URI} ^/uploads/ [NC]
+RewriteRule ^ - [L]
+
+# ── GHL + ImgBB credentials ───────────────────────────────────────
+SetEnv GHL_PRIVATE_TOKEN pit-0d20f8fc-2d84-4795-ba05-098a2f7b99e3
+SetEnv GHL_LOCATION_ID I6ZFYN1013tvUPyAYOl6
+SetEnv GHL_PIPELINE_ID ctqaZsPZyWZdeLdwuhmM
+SetEnv GHL_STAGE_ID e3031757-d877-4193-9675-dbe23be37f22
+SetEnv IMGBB_API_KEY c2a86e967ccd49d1f3db956b58434dd0
+
+# Block direct access to config
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>

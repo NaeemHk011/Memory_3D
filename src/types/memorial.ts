@@ -7,6 +7,7 @@ export interface Memorial {
   death_date: string | null;
   bio: string | null;
   cover_photo: string | null;
+  profile_photo: string | null;
   is_private: boolean;
   share_token: string;
   created_at: string;
@@ -28,7 +29,8 @@ export interface MemorialStory {
   memorial_id: string;
   author_id: string | null;
   author_name: string;
-  title: string;
+  relationship: string | null;
+  title: string | null;
   content: string;
   is_approved: boolean;
   created_at: string;
